@@ -6,11 +6,11 @@ import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -21,22 +21,21 @@ public class DefaultSearchingService implements SearchingService {
 
     private final EntityManager em;
 
-    protected DefaultSearchingService(@Autowired EntityManager em) {
+    protected DefaultSearchingService(EntityManager em) {
         this.em = em;
     }
 
     @Override
+    @Transactional
     public List<Track> findAllBy(@Nullable String song,
                                  @Nullable String artist,
                                  @Nullable Timestamp start,
                                  @Nullable Timestamp end,
                                  @Nullable Long after,
                                  int count,
-                                 boolean underground) throws InterruptedException {
-        LOGGER.info("Initializing indexing...");
+                                 boolean underground) {
+        LOGGER.info("Getting entity manager stuff...");
         FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
-        fullTextEntityManager.createIndexer().startAndWait();
-        LOGGER.info("All entities indexed");
 
         QueryBuilder qb = fullTextEntityManager
                 .getSearchFactory()

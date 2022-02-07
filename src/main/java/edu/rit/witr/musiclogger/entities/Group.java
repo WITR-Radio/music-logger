@@ -28,7 +28,7 @@ public class Group {
     @Column(name = "updated_at", nullable = false)
     private java.sql.Date updated;
 
-    protected Group() {}
+    public Group() {}
 
     public Group(String name, @NonNull Date created, @NonNull Date updated) {
         this.name = name;

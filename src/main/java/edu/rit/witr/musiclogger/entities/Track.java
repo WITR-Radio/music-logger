@@ -2,9 +2,9 @@ package edu.rit.witr.musiclogger.entities;
 
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Indexed;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,7 +59,7 @@ public class Track {
 
     // TODO: Original database had `queue_job_id` INT(16) but isn't used anywhere
 
-    protected Track() {}
+    public Track() {}
 
     public Track(String artist, String title, Timestamp time, boolean rivendell, Group group, @NonNull Date created, @NonNull Date updated, boolean request, String requester) {
         this.artist = artist;
@@ -147,5 +147,21 @@ public class Track {
 
     public void setRequester(String requester) {
         this.requester = requester;
+    }
+
+    @Override
+    public String toString() {
+        return "Track{" +
+                "id=" + id +
+                ", artist='" + artist + '\'' +
+                ", title='" + title + '\'' +
+                ", time=" + time +
+                ", rivendell=" + rivendell +
+                ", group=" + group +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", request=" + request +
+                ", requester='" + requester + '\'' +
+                '}';
     }
 }
