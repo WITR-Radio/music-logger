@@ -4,18 +4,26 @@ import edu.rit.witr.musiclogger.database.GroupRepository;
 import edu.rit.witr.musiclogger.database.TrackRepository;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.stream.Stream;
 
 @SpringBootApplication
+@EntityScan({"edu.rit.witr.musiclogger.entities"})
 public class MusicLoggerApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MusicLoggerApplication.class);
@@ -27,8 +35,8 @@ public class MusicLoggerApplication {
     @Bean
     public CommandLineRunner demo(GroupRepository groupRepository, TrackRepository trackRepository) {
         return args -> {
-            // initGroups(groupRepository);
-//            initTracks(trackRepository);
+             initGroups(groupRepository);
+            initTracks(trackRepository);
 
             LOGGER.info("All groups:");
             for (var group : groupRepository.findAll()) {

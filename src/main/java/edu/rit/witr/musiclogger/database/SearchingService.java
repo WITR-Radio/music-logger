@@ -23,8 +23,8 @@ public interface SearchingService {
      */
     List<Track> findAllBy(@Nullable String song,
                           @Nullable String artist,
-                          @Nullable Timestamp start,
-                          @Nullable Timestamp end,
+                          @Nullable Timestamp afterTime,
+                          @Nullable Timestamp before,
                           @Nullable Long after,
                           int count,
                           boolean underground) throws InterruptedException;

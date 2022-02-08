@@ -14,7 +14,6 @@ public class GroupController {
 
     public GroupController(GroupRepository repository) {
         this.repository = repository;
-//        org.elasticsearch.client.sniff.HostsSniffer
     }
 
     @GetMapping("/groups/list")

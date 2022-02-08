@@ -1,9 +1,9 @@
 package edu.rit.witr.musiclogger.entities;
 
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -20,28 +21,27 @@ import java.sql.Timestamp;
 
 @Entity
 @Indexed
-@Analyzer(definition = "standard")
+@Table(name = "tracks")
 public class Track {
 
     @Id
-    @SortableField
+    @GenericField(sortable = Sortable.YES)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Field
+    @KeywordField
     private String artist;
 
-    @Field
+    @KeywordField
     private String title;
 
-    @Field
-    @SortableField
+    @GenericField(sortable = Sortable.YES)
     private Timestamp time;
 
     private Boolean rivendell;
 
     // TODO: For ManyToOne, I don't need a list of Tracks in Group, right?
-    @ManyToOne
+    @ManyToOne(targetEntity = Group.class)
     @JoinColumn(name = "group_id")
     private Group group;
 

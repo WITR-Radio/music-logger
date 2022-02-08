@@ -7,14 +7,14 @@ spring:
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQL92Dialect
         search:
-          default:
-            indexmanager: elasticsearch
-            elasticsearch:
-              host: http://localhost:9200
-              index_schema_management_strategy: drop-and-create
-              required_index_status: yellow
+          backend:
+            type: elasticsearch
+            uris: http://localhost:9200
+            schema_management:
+              minimal_required_status: yellow
+              strategy: drop-and-create

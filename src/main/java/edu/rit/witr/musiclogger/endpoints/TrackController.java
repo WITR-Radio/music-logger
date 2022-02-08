@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @RestController
@@ -28,6 +29,6 @@ public class TrackController {
     @GetMapping("/tracks/list")
     List<Track> listGroups(@RequestParam int count) throws InterruptedException {
         LOGGER.info("listing {} results", count);
-        return searchingService.findAllBy(null, null, null, null, null, count, false);
+        return searchingService.findAllBy(null, null, null, Timestamp.valueOf("2022-2-12 18:00:00"), null, count, false);
     }
 }

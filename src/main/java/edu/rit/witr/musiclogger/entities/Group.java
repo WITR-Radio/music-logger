@@ -1,5 +1,9 @@
 package edu.rit.witr.musiclogger.entities;
 
+//import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
@@ -34,6 +38,10 @@ public class Group {
         this.name = name;
         this.created = created;
         this.updated = updated;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getName() {

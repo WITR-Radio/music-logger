@@ -1,9 +1,13 @@
 package edu.rit.witr.musiclogger.database;
 
 import edu.rit.witr.musiclogger.entities.Track;
-import org.hibernate.search.jpa.FullTextEntityManager;
-import org.hibernate.search.jpa.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
+//import org.hibernate.search.jpa.FullTextEntityManager;
+//import org.hibernate.search.jpa.Search;
+//import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.awt.print.Book;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -35,55 +40,48 @@ public class DefaultSearchingService implements SearchingService {
                                  int count,
                                  boolean underground) {
         LOGGER.info("Getting entity manager stuff...");
-        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+        SearchSession session = Search.session(em);
 
-        QueryBuilder qb = fullTextEntityManager
-                .getSearchFactory()
-                .buildQueryBuilder()
-                .forEntity(Track.class)
-                .get();
+        return session.search(Track.class)
+                .where(f -> f.bool(b -> {
+                    b.must(f.matchAll());
+                    if (song != null) {
+                        b.must(f.match().field("title").matching(song));
+                    }
 
-        var finalQuery = qb.bool();
+                    if (artist != null) {
+                        b.must(f.match().field("artist").matching(artist));
+                    }
 
-        if (song != null) {
-            finalQuery.must(qb.keyword()
-                    .onField("title")
-                    .matching(song)
-                    .createQuery());
-        }
+                    if (start != null) {
+                        b.must(f.range().field("time").atLeast(start));
+                    }
 
-        if (artist != null) {
-            finalQuery.must(qb.keyword()
-                    .onField("artist")
-                    .matching(artist)
-                    .createQuery());
-        }
+                    if (end != null) {
+                        b.must(f.range().field("time").atMost(end));
+                    }
 
-        if (start != null) {
-            finalQuery.must(qb.range()
-                    .onField("time")
-                    .above(start)
-                    .createQuery());
-        }
+                    if (after != null) {
+                        b.must(f.range().field("time").atLeast(after));
+                    }
+                }))
+                .fetchHits(count);
 
-        if (end != null) {
-            finalQuery.must(qb.range()
-                    .onField("time")
-                    .below(end)
-                    .createQuery());
-        }
+//        SearchQuerySelectStep step = session.search(Track.class);
 
-        if (after != null) {
-            finalQuery.must(qb.range()
-                    .onField("time")
-                    .above(after)
-                    .createQuery());
-        }
+//        QueryBuilder qb = fullTextEntityManager
+//                .getSearchFactory()
+//                .buildQueryBuilder()
+//                .forEntity(Track.class)
+//                .get();
 
-        var fullTextQuery = fullTextEntityManager.createFullTextQuery(finalQuery.createQuery(), Track.class);
-        fullTextQuery.setSort(qb.sort().byScore().createSort());
-        fullTextQuery.setMaxResults(count);
-        return (List<Track>) fullTextQuery.getResultList();
+//        var finalQuery = qb.bool();
+
+
+//        var fullTextQuery = fullTextEntityManager.createFullTextQuery(finalQuery.createQuery(), Track.class);
+//        fullTextQuery.setSort(qb.sort().byScore().createSort());
+//        fullTextQuery.setMaxResults(count);
+//        return (List<Track>) fullTextQuery.getResultList();
     }
 
 }
