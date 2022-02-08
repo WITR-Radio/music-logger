@@ -6,6 +6,7 @@ import edu.rit.witr.musiclogger.entities.Track;
 //import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;
@@ -34,8 +35,8 @@ public class DefaultSearchingService implements SearchingService {
     @Transactional
     public List<Track> findAllBy(@Nullable String song,
                                  @Nullable String artist,
-                                 @Nullable Timestamp start,
-                                 @Nullable Timestamp end,
+                                 @Nullable Timestamp afterTime,
+                                 @Nullable Timestamp beforeTime,
                                  @Nullable Long after,
                                  int count,
                                  boolean underground) {
@@ -45,43 +46,35 @@ public class DefaultSearchingService implements SearchingService {
         return session.search(Track.class)
                 .where(f -> f.bool(b -> {
                     b.must(f.matchAll());
-                    if (song != null) {
-                        b.must(f.match().field("title").matching(song));
-                    }
 
-                    if (artist != null) {
-                        b.must(f.match().field("artist").matching(artist));
-                    }
-
-                    if (start != null) {
-                        b.must(f.range().field("time").atLeast(start));
-                    }
-
-                    if (end != null) {
-                        b.must(f.range().field("time").atMost(end));
+                    if (afterTime != null) {
+                        if (beforeTime != null) {
+                            b.filter(f.range().field("time").between(beforeTime, afterTime));
+                        } else {
+                            b.filter(f.range().field("time").atMost(afterTime));
+                        }
                     }
 
                     if (after != null) {
-                        b.must(f.range().field("time").atLeast(after));
+                        b.filter(f.range().field("time").atLeast(after));
+                    }
+
+                    if (song != null) {
+                        b.must(f.match().field("title").matching(song).boost(10));
+                    }
+
+                    if (artist != null) {
+                        b.must(f.match().field("artist").matching(artist).boost(5));
                     }
                 }))
+                .sort(sort -> {
+                    if (song != null || artist != null) {
+                        return sort.score();
+                    }
+
+                    return sort.field("id").desc();
+                })
                 .fetchHits(count);
-
-//        SearchQuerySelectStep step = session.search(Track.class);
-
-//        QueryBuilder qb = fullTextEntityManager
-//                .getSearchFactory()
-//                .buildQueryBuilder()
-//                .forEntity(Track.class)
-//                .get();
-
-//        var finalQuery = qb.bool();
-
-
-//        var fullTextQuery = fullTextEntityManager.createFullTextQuery(finalQuery.createQuery(), Track.class);
-//        fullTextQuery.setSort(qb.sort().byScore().createSort());
-//        fullTextQuery.setMaxResults(count);
-//        return (List<Track>) fullTextQuery.getResultList();
     }
 
 }

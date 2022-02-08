@@ -35,8 +35,8 @@ public class MusicLoggerApplication {
     @Bean
     public CommandLineRunner demo(GroupRepository groupRepository, TrackRepository trackRepository) {
         return args -> {
-             initGroups(groupRepository);
-            initTracks(trackRepository);
+//            initGroups(groupRepository);
+//            initTracks(trackRepository);
 
             LOGGER.info("All groups:");
             for (var group : groupRepository.findAll()) {

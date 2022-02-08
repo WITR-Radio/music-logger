@@ -24,7 +24,7 @@ public interface SearchingService {
     List<Track> findAllBy(@Nullable String song,
                           @Nullable String artist,
                           @Nullable Timestamp afterTime,
-                          @Nullable Timestamp before,
+                          @Nullable Timestamp beforeTime,
                           @Nullable Long after,
                           int count,
                           boolean underground) throws InterruptedException;

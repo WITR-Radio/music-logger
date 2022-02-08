@@ -29,6 +29,7 @@ public class TrackController {
     @GetMapping("/tracks/list")
     List<Track> listGroups(@RequestParam int count) throws InterruptedException {
         LOGGER.info("listing {} results", count);
-        return searchingService.findAllBy(null, null, null, Timestamp.valueOf("2022-2-12 18:00:00"), null, count, false);
+//        return searchingService.findAllBy(null, null, null, Timestamp.valueOf("2022-2-12 18:00:00"), null, count, false);
+        return searchingService.findAllBy(null, null, Timestamp.valueOf("2022-02-22 18:00:00"), null, null, count, false);
     }
 }
