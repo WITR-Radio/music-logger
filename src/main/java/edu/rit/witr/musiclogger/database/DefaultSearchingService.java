@@ -37,7 +37,7 @@ public class DefaultSearchingService implements SearchingService {
                                  @Nullable String artist,
                                  @Nullable Timestamp afterTime,
                                  @Nullable Timestamp beforeTime,
-                                 @Nullable Long after,
+                                 @Nullable Long before,
                                  int count,
                                  boolean underground) {
         LOGGER.info("Getting entity manager stuff...");
@@ -55,8 +55,8 @@ public class DefaultSearchingService implements SearchingService {
                         }
                     }
 
-                    if (after != null) {
-                        b.filter(f.range().field("time").atLeast(after));
+                    if (before != null) {
+                        b.filter(f.range().field("time").lessThan(new Timestamp(before)));
                     }
 
                     if (song != null) {

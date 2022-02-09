@@ -13,9 +13,9 @@ public interface SearchingService {
      *
      * @param song        The song
      * @param artist      The artist
-     * @param start       Show results after this date
-     * @param end         Restrict results to before this date
-     * @param after       The timestamp to list after, used for paginating
+     * @param afterTime   Show results after this date/time
+     * @param beforeTime  Restrict results to before this date/time
+     * @param before      The timestamp to list before, used for paginating
      * @param count       The amount of results to return
      * @param underground If this should search underground data
      * @return The found tracks
@@ -25,7 +25,7 @@ public interface SearchingService {
                           @Nullable String artist,
                           @Nullable Timestamp afterTime,
                           @Nullable Timestamp beforeTime,
-                          @Nullable Long after,
+                          @Nullable Long before,
                           int count,
                           boolean underground) throws InterruptedException;
 }

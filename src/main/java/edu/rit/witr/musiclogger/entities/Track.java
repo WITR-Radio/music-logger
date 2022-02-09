@@ -1,17 +1,19 @@
 package edu.rit.witr.musiclogger.entities;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import edu.rit.witr.musiclogger.entities.serializer.TrackSerializer;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,6 +25,7 @@ import java.sql.Timestamp;
 @Entity
 @Indexed
 @Table(name = "tracks")
+@JsonSerialize(using = TrackSerializer.class)
 public class Track {
 
     @Id
@@ -36,6 +39,8 @@ public class Track {
     @KeywordField
     private String title;
 
+    // TODO: In the current database this is nullable... why?
+    @NonNull
     @GenericField(sortable = Sortable.YES)
     private Timestamp time;
 
@@ -78,7 +83,7 @@ public class Track {
         return id;
     }
 
-    public String getArtist() {
+    public @Nullable String getArtist() {
         return artist;
     }
 
@@ -86,7 +91,7 @@ public class Track {
         this.artist = artist;
     }
 
-    public String getTitle() {
+    public @Nullable String getTitle() {
         return title;
     }
 
@@ -110,7 +115,7 @@ public class Track {
         this.rivendell = rivendell;
     }
 
-    public Group getGroup() {
+    public @Nullable Group getGroup() {
         return group;
     }
 
@@ -142,7 +147,7 @@ public class Track {
         this.request = request;
     }
 
-    public String getRequester() {
+    public @Nullable String getRequester() {
         return requester;
     }
 
