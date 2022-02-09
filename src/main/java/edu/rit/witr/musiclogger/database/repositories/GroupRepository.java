@@ -1,4 +1,4 @@
-package edu.rit.witr.musiclogger.database;
+package edu.rit.witr.musiclogger.database.repositories;
 
 import edu.rit.witr.musiclogger.entities.Group;
 import org.springframework.data.repository.CrudRepository;

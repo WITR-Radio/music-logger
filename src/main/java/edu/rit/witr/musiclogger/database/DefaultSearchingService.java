@@ -1,9 +1,6 @@
 package edu.rit.witr.musiclogger.database;
 
 import edu.rit.witr.musiclogger.entities.Track;
-//import org.hibernate.search.jpa.FullTextEntityManager;
-//import org.hibernate.search.jpa.Search;
-//import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;

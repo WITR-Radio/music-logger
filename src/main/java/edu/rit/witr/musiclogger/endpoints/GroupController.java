@@ -1,6 +1,6 @@
 package edu.rit.witr.musiclogger.endpoints;
 
-import edu.rit.witr.musiclogger.database.GroupRepository;
+import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
 import edu.rit.witr.musiclogger.entities.Group;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

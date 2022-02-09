@@ -14,16 +14,13 @@ public class IndexingService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IndexingService.class);
 
-//    @PersistenceContext
-    private EntityManager em = HibernateOptions.getEntityManager();
+    private final EntityManager em = HibernateOptions.getEntityManager();
 
     @Transactional
     public void initiateIndexing() throws InterruptedException {
         LOGGER.info("Initiating indexing...");
         SearchSession session = Search.session(em);
         session.massIndexer().startAndWait();
-//        FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
-//        fullTextEntityManager.createIndexer().startAndWait();
         LOGGER.info("All entities indexed");
     }
 

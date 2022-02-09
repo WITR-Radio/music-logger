@@ -1,10 +1,9 @@
 package edu.rit.witr.musiclogger;
 
-import edu.rit.witr.musiclogger.database.GroupRepository;
-import edu.rit.witr.musiclogger.database.TrackRepository;
+import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
+import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
-import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -12,13 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
