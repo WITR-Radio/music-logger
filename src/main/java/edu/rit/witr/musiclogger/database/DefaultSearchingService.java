@@ -4,9 +4,6 @@ import edu.rit.witr.musiclogger.entities.Track;
 //import org.hibernate.search.jpa.FullTextEntityManager;
 //import org.hibernate.search.jpa.Search;
 //import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryFinalStep;
-import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.awt.print.Book;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -35,8 +31,8 @@ public class DefaultSearchingService implements SearchingService {
     @Transactional
     public List<Track> findAllBy(@Nullable String song,
                                  @Nullable String artist,
-                                 @Nullable Timestamp afterTime,
-                                 @Nullable Timestamp beforeTime,
+                                 @Nullable Long afterTime,
+                                 @Nullable Long beforeTime,
                                  @Nullable Long before,
                                  int count,
                                  boolean underground) {
@@ -49,9 +45,9 @@ public class DefaultSearchingService implements SearchingService {
 
                     if (afterTime != null) {
                         if (beforeTime != null) {
-                            b.filter(f.range().field("time").between(beforeTime, afterTime));
+                            b.filter(f.range().field("time").between(new Timestamp(beforeTime), new Timestamp(afterTime)));
                         } else {
-                            b.filter(f.range().field("time").atMost(afterTime));
+                            b.filter(f.range().field("time").atMost(new Timestamp(afterTime)));
                         }
                     }
 
@@ -60,11 +56,15 @@ public class DefaultSearchingService implements SearchingService {
                     }
 
                     if (song != null) {
-                        b.must(f.match().field("title").matching(song).boost(10));
+                        // Exact matching should be higher
+                        b.must(f.match().field("title").matching(song));
+
+                        // TODO: Inspect fuzzy searching
+                        b.should(f.match().field("title").matching(song).fuzzy(2));
                     }
 
                     if (artist != null) {
-                        b.must(f.match().field("artist").matching(artist).boost(5));
+                        b.must(f.match().field("artist").matching(artist));
                     }
                 }))
                 .sort(sort -> {

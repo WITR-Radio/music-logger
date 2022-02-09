@@ -3,6 +3,7 @@ package edu.rit.witr.musiclogger.entities;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import edu.rit.witr.musiclogger.entities.serializer.TrackSerializer;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -33,10 +34,10 @@ public class Track {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @KeywordField
+    @FullTextField(analyzer = "standard")
     private String artist;
 
-    @KeywordField
+    @FullTextField(analyzer = "standard")
     private String title;
 
     // TODO: In the current database this is nullable... why?

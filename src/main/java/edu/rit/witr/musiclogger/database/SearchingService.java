@@ -3,7 +3,6 @@ package edu.rit.witr.musiclogger.database;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.springframework.lang.Nullable;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 public interface SearchingService {
@@ -23,8 +22,8 @@ public interface SearchingService {
      */
     List<Track> findAllBy(@Nullable String song,
                           @Nullable String artist,
-                          @Nullable Timestamp afterTime,
-                          @Nullable Timestamp beforeTime,
+                          @Nullable Long afterTime,
+                          @Nullable Long beforeTime,
                           @Nullable Long before,
                           int count,
                           boolean underground) throws InterruptedException;

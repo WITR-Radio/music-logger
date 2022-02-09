@@ -9,6 +9,10 @@ import java.io.IOException;
 
 public class TrackSerializer extends StdSerializer<Track> {
 
+    public TrackSerializer() {
+        this(null);
+    }
+
     protected TrackSerializer(Class<Track> t) {
         super(t);
     }
