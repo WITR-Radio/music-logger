@@ -14,7 +14,7 @@ public interface SearchingService {
      * @param artist      The artist
      * @param afterTime   Show results after this date/time
      * @param beforeTime  Restrict results to before this date/time
-     * @param before      The timestamp to list before, used for paginating
+     * @param offset      The number of results to skip, for paging
      * @param count       The amount of results to return
      * @param underground If this should search underground data
      * @return The found tracks
@@ -24,7 +24,7 @@ public interface SearchingService {
                           @Nullable String artist,
                           @Nullable Long afterTime,
                           @Nullable Long beforeTime,
-                          @Nullable Long before,
+                          int offset,
                           int count,
                           boolean underground) throws InterruptedException;
 }

@@ -1,6 +1,6 @@
 Copyright (c) WITR. All Rights Not Explicitly Granted are Reserved.
 
-This software (public_frontend) is the sole property of WITR (under the domain witr.rit.edu) and is provided to the developers
+This software (music-logger) is the sole property of WITR (under the domain witr.rit.edu) and is provided to the developers
 of this software for development with the following exemption:
 
 The developers of this software are permitted to modify this software freely. The software may be exhibited in any situation, including

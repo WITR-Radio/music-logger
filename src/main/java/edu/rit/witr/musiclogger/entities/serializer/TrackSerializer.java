@@ -27,8 +27,6 @@ public class TrackSerializer extends StdSerializer<Track> {
         var time = track.getTime();
         json.writeStringField("time", time != null ? time.toString() : null); // TODO: What date format?
 
-        json.writeStringField("requester", track.getRequester());
-
         var group = track.getGroup();
         json.writeStringField("group", group != null ? group.getName() : null);
 

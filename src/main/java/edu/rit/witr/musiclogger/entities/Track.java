@@ -60,15 +60,11 @@ public class Track {
     @Column(name = "updated_at", nullable = false)
     private java.sql.Date updated;
 
-    private Boolean request;
-
-    private String requester;
-
     // TODO: Original database had `queue_job_id` INT(16) but isn't used anywhere
 
     public Track() {}
 
-    public Track(String artist, String title, Timestamp time, boolean rivendell, Group group, @NonNull Date created, @NonNull Date updated, boolean request, String requester) {
+    public Track(String artist, String title, Timestamp time, boolean rivendell, Group group, @NonNull Date created, @NonNull Date updated) {
         this.artist = artist;
         this.title = title;
         this.time = time;
@@ -76,8 +72,6 @@ public class Track {
         this.group = group;
         this.created = created;
         this.updated = updated;
-        this.request = request;
-        this.requester = requester;
     }
 
     public long getId() {
@@ -140,22 +134,6 @@ public class Track {
         this.updated = updated;
     }
 
-    public boolean isRequest() {
-        return request;
-    }
-
-    public void setRequest(boolean request) {
-        this.request = request;
-    }
-
-    public @Nullable String getRequester() {
-        return requester;
-    }
-
-    public void setRequester(String requester) {
-        this.requester = requester;
-    }
-
     @Override
     public String toString() {
         return "Track{" +
@@ -167,8 +145,6 @@ public class Track {
                 ", group=" + group +
                 ", created=" + created +
                 ", updated=" + updated +
-                ", request=" + request +
-                ", requester='" + requester + '\'' +
                 '}';
     }
 }

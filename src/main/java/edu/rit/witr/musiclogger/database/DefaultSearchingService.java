@@ -1,6 +1,7 @@
 package edu.rit.witr.musiclogger.database;
 
 import edu.rit.witr.musiclogger.entities.Track;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class DefaultSearchingService implements SearchingService {
                                  @Nullable String artist,
                                  @Nullable Long afterTime,
                                  @Nullable Long beforeTime,
-                                 @Nullable Long before,
+                                 int offset,
                                  int count,
                                  boolean underground) {
         LOGGER.info("Getting entity manager stuff...");
@@ -46,10 +47,6 @@ public class DefaultSearchingService implements SearchingService {
                         } else {
                             b.filter(f.range().field("time").atMost(new Timestamp(afterTime)));
                         }
-                    }
-
-                    if (before != null) {
-                        b.filter(f.range().field("time").lessThan(new Timestamp(before)));
                     }
 
                     if (song != null) {
@@ -71,7 +68,7 @@ public class DefaultSearchingService implements SearchingService {
 
                     return sort.field("id").desc();
                 })
-                .fetchHits(count);
+                .fetchHits(offset, count);
     }
 
 }

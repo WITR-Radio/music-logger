@@ -37,7 +37,7 @@ public class AddedTrack implements Validatable {
      */
     public Track toTrack(@Nullable Group group) {
         var createdDate = new Date(time);
-        return new Track(artist, title, new Timestamp(time), false, group, createdDate, createdDate, false, null);
+        return new Track(artist, title, new Timestamp(time), false, group, createdDate, createdDate);
     }
 
     public String getTitle() {

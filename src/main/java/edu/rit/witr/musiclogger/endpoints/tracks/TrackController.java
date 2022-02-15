@@ -9,6 +9,8 @@ import edu.rit.witr.musiclogger.database.repositories.TrackUpdater;
 import edu.rit.witr.musiclogger.endpoints.EndpointUtility;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class TrackController {
@@ -53,10 +60,10 @@ public class TrackController {
                                         @RequestParam(required = false) Long start,
                                         @RequestParam(required = false) Long end,
                                         @RequestParam(defaultValue = "20") int count,
-                                        @RequestParam(required = false) Long after,
+                                        @RequestParam(defaultValue = "0") int offset,
                                         @RequestParam(defaultValue = "false") boolean underground)
             throws InterruptedException {
-        var tracks = searchingService.findAllBy(song, artist, start, end, after, count, underground);
+        var tracks = searchingService.findAllBy(song, artist, start, end, offset, count, underground);
         var node = constructTrackObject(request, tracks, count);
         return new ResponseEntity<>(node, HttpStatus.OK);
     }
@@ -130,16 +137,22 @@ public class TrackController {
         var node = mapper.createObjectNode();
         var trackArray = node.putArray("tracks");
         tracks.forEach(trackArray::addPOJO);
-        var next = request.getRequestURL()
-                .append("?count=")
-                .append(count);
+
+        var query = new HashMap<>(URLEncodedUtils.parse(request.getQueryString(), StandardCharsets.UTF_8)
+                .stream()
+                .collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue)));
 
         if (!tracks.isEmpty()) {
-            next.append("&after=").append(tracks.get(tracks.size() - 1).getTime().getTime());
+            var currAfter = Integer.parseInt(query.getOrDefault("offset", "0"));
+            query.put("offset", String.valueOf(currAfter + count));
         }
 
         node.putObject("_links")
-                .put("next", next.toString());
+                .put("next", request.getRequestURL() + "?" +
+                        query.entrySet()
+                                .stream()
+                                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                                .collect(Collectors.joining("&")));
         return node;
     }
 }
