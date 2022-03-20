@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class GroupController {
@@ -17,7 +18,10 @@ public class GroupController {
     }
 
     @GetMapping("/groups/list")
-    List<Group> listGroups() {
-        return repository.findAll();
+    List<String> listGroups() {
+        return repository.findAll()
+                .stream()
+                .map(Group::getName)
+                .collect(Collectors.toList());
     }
 }

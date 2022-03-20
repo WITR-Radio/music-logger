@@ -4,6 +4,7 @@ import edu.rit.witr.musiclogger.entities.Track;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface TrackRepository extends CrudRepository<Track, Long> {
@@ -14,5 +15,7 @@ public interface TrackRepository extends CrudRepository<Track, Long> {
     }
 
     List<Track> findAllByOrderByIdDesc();
+
+    List<Track> findAllByTimeBetween(Timestamp start, Timestamp end);
 
 }
