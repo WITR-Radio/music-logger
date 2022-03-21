@@ -28,8 +28,10 @@ public class ExportController {
     }
 
     @GetMapping("/export")
-    ResponseEntity<StreamingResponseBody>  export(@RequestParam(required = false) Long start,
-                    @RequestParam(required = false) Long end) {
+    ResponseEntity<StreamingResponseBody> export(@RequestParam(required = false) Long start,
+                                                 @RequestParam(required = false) Long end,
+                                                 @RequestParam(required = false) Integer limit, // TODO: Limit
+                                                 @RequestParam(defaultValue = "export.csv") String fileName) {
         List<Track> tracks;
 
         if (start == null || end == null) {
@@ -54,7 +56,7 @@ public class ExportController {
         };
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=export.csv")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(responseBody);
     }
