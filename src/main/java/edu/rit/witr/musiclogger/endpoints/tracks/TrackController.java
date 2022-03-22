@@ -71,7 +71,7 @@ public class TrackController {
     }
 
     @PostMapping("/tracks/add")
-    public ResponseEntity<?> addTrack(@RequestBody AddedTrack adding, @RequestParam boolean underground) {
+    public ResponseEntity<?> addTrack(@RequestBody AddedTrack adding, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Adding: {}", adding);
 
         if (!adding.validate()) {
@@ -101,7 +101,7 @@ public class TrackController {
     }
 
     @PatchMapping("/tracks/update")
-    public ResponseEntity<?> updateTrack(@RequestBody UpdatingTrack updating) {
+    public ResponseEntity<?> updateTrack(@RequestBody UpdatingTrack updating, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Updating: {}", updating);
 
         if (!updating.validate()) {
