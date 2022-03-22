@@ -5,6 +5,9 @@ import org.springframework.lang.Nullable;
 
 import java.util.List;
 
+/**
+ * A service to search the database.
+ */
 public interface SearchingService {
 
     /**

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+/**
+ * A service to index the database via Elasticsearch.
+ */
 @Service
 public class IndexingService {
 
@@ -16,6 +19,11 @@ public class IndexingService {
 
     private final EntityManager em = HibernateOptions.getEntityManager();
 
+    /**
+     * Indexes the database.
+     *
+     * @throws InterruptedException
+     */
     @Transactional
     public void initiateIndexing() throws InterruptedException {
         LOGGER.info("Initiating indexing...");

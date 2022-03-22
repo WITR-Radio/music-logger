@@ -23,6 +23,9 @@ import java.sql.Timestamp;
 
 // TODO: Add more analyzers for improved searching?
 
+/**
+ * An individual track object, stored in the {@code tracks} table.
+ */
 @Entity
 @Indexed
 @Table(name = "tracks")

@@ -1,9 +1,5 @@
 package edu.rit.witr.musiclogger.entities;
 
-//import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
@@ -14,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Date;
 
+/**
+ * A group/category of songs, stored in the {@code groups} table.
+ */
 @Entity
 @Table(name = "groups")
 public class Group {

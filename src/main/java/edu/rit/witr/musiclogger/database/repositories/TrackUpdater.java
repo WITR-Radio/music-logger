@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * A service to update tracks by their ID
+ */
 @Service
 public class TrackUpdater {
 

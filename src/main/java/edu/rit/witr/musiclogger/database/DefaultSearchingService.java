@@ -14,6 +14,9 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * The default implementation of {@link SearchingService} that searches via Elasticsearch.
+ */
 @Service
 public class DefaultSearchingService implements SearchingService {
 

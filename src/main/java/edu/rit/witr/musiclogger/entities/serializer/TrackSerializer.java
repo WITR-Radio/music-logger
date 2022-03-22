@@ -7,6 +7,10 @@ import edu.rit.witr.musiclogger.entities.Track;
 
 import java.io.IOException;
 
+/**
+ * The custom JSON serializer for {@link Track}. This has been implemented to allow for advanced customizability, such
+ * as optional values or exclusion of fields.
+ */
 public class TrackSerializer extends StdSerializer<Track> {
 
     public TrackSerializer() {

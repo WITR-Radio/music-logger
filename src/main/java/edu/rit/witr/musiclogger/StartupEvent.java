@@ -7,6 +7,9 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * A class to invoke initialization events.
+ */
 @Component
 public class StartupEvent implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -18,6 +21,11 @@ public class StartupEvent implements ApplicationListener<ApplicationReadyEvent> 
         this.service = service;
     }
 
+    /**
+     * Initializes the indexing service.
+     *
+     * @param event The supplied event
+     */
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         try {

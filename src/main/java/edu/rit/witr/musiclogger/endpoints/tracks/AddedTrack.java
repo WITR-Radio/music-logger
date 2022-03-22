@@ -7,6 +7,9 @@ import org.springframework.lang.Nullable;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+/**
+ * Used as the POST body for requests, this class represents a track that is being added to the system.
+ */
 public class AddedTrack implements Validatable {
     private final String title;
     private final String artist;
@@ -22,6 +25,7 @@ public class AddedTrack implements Validatable {
 
     /**
      * Validates the currently added track to check for missing values.
+     *
      * @return true if all parameters are existent
      */
     @Override
@@ -32,6 +36,7 @@ public class AddedTrack implements Validatable {
     /**
      * Converts this into a {@link Track} to add to the database. This assumes all data in this object is present
      * and valid.
+     *
      * @param group The group to pair the {@link Track} with
      * @return The {@link Track}
      */
@@ -40,18 +45,37 @@ public class AddedTrack implements Validatable {
         return new Track(artist, title, new Timestamp(time), false, group, createdDate, createdDate);
     }
 
+    /**
+     * Gets the title of the track.
+     * @return The title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Gets the artist of the track.
+     *
+     * @return The artist
+     */
     public String getArtist() {
         return artist;
     }
 
+    /**
+     * Gets the group name of the track.
+     *
+     * @return The group name
+     */
     public String getGroup() {
         return group;
     }
 
+    /**
+     * Gets the time in milliseconds the track played at.
+     *
+     * @return The time in milliseconds
+     */
     public Long getTime() {
         return time;
     }

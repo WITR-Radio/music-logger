@@ -25,15 +25,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The controller for all /track/ endpoints.
+ * This relates to everything dealing with tracks themselves, e.g. listing, adding, updating, etc.
+ */
 @RestController
 public class TrackController {
 
@@ -126,6 +128,12 @@ public class TrackController {
         return new ResponseEntity<>(trackRepository.findById(updating.getId()), HttpStatus.OK);
     }
 
+    /**
+     * Looks through the database and finds the {@link Group} that is owned by the {@link AddedTrack}.
+     *
+     * @param track The track to get the group of
+     * @return The {@link Group}, if found
+     */
     private Optional<Group> findGroup(AddedTrack track) {
         return groupRepository.findAll()
                 .stream()
@@ -133,6 +141,32 @@ public class TrackController {
                 .findFirst();
     }
 
+    /**
+     * Constructs the JSON object to send back to the client containing a list of tracks and an additional
+     * <code>_links</code> object. An example of this is:
+     * <pre>
+     * {
+     *     "tracks": [
+     *         {
+     *             "id": 626,
+     *             "artist": "Artist 99",
+     *             "title": "Your Girlfriend",
+     *             "time": "2022-04-10 01:00:00.0",
+     *             "group": "Feature"
+     *         },
+     *         // ...
+     *     ],
+     *     "_links": {
+     *         "next": "http://localhost:8080/tracks/list?offset=20"
+     *     }
+     * }
+     * </pre>
+     *
+     * @param request The original {@link HttpServletRequest}
+     * @param tracks The {@link Track}s to list
+     * @param count The amount of tracks requested originally
+     * @return The JSON {@link ObjectNode} to be serialized and sent
+     */
     private ObjectNode constructTrackObject(HttpServletRequest request, List<Track> tracks, int count) {
         var node = mapper.createObjectNode();
         var trackArray = node.putArray("tracks");
