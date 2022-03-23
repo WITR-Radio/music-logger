@@ -48,33 +48,20 @@ public class Track {
     @GenericField(sortable = Sortable.YES)
     private Timestamp time;
 
-    private Boolean rivendell;
-
     // TODO: For ManyToOne, I don't need a list of Tracks in Group, right?
     @ManyToOne(targetEntity = Group.class)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @NonNull
-    @Column(name = "created_at", nullable = false)
-    private java.sql.Date created;
-
-    @NonNull
-    @Column(name = "updated_at", nullable = false)
-    private java.sql.Date updated;
-
     // TODO: Original database had `queue_job_id` INT(16) but isn't used anywhere
 
     public Track() {}
 
-    public Track(String artist, String title, Timestamp time, boolean rivendell, Group group, @NonNull Date created, @NonNull Date updated) {
+    public Track(String artist, String title, @NonNull Timestamp time, Group group) {
         this.artist = artist;
         this.title = title;
         this.time = time;
-        this.rivendell = rivendell;
         this.group = group;
-        this.created = created;
-        this.updated = updated;
     }
 
     public long getId() {
@@ -97,20 +84,12 @@ public class Track {
         this.title = title;
     }
 
-    public Timestamp getTime() {
+    public @NonNull Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(@NonNull Timestamp time) {
         this.time = time;
-    }
-
-    public Boolean isRivendell() {
-        return rivendell;
-    }
-
-    public void setRivendell(Boolean rivendell) {
-        this.rivendell = rivendell;
     }
 
     public @Nullable Group getGroup() {
@@ -121,22 +100,6 @@ public class Track {
         this.group = group;
     }
 
-    public @NonNull Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(@NonNull Date created) {
-        this.created = created;
-    }
-
-    public @NonNull Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(@NonNull Date updated) {
-        this.updated = updated;
-    }
-
     @Override
     public String toString() {
         return "Track{" +
@@ -144,10 +107,7 @@ public class Track {
                 ", artist='" + artist + '\'' +
                 ", title='" + title + '\'' +
                 ", time=" + time +
-                ", rivendell=" + rivendell +
                 ", group=" + group +
-                ", created=" + created +
-                ", updated=" + updated +
                 '}';
     }
 }

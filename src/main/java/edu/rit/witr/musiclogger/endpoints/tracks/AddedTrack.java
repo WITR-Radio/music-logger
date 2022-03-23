@@ -4,7 +4,6 @@ import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.springframework.lang.Nullable;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 /**
@@ -41,8 +40,7 @@ public class AddedTrack implements Validatable {
      * @return The {@link Track}
      */
     public Track toTrack(@Nullable Group group) {
-        var createdDate = new Date(time);
-        return new Track(artist, title, new Timestamp(time), false, group, createdDate, createdDate);
+        return new Track(artist, title, new Timestamp(time), group);
     }
 
     /**

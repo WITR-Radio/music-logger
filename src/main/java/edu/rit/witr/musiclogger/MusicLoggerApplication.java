@@ -49,7 +49,7 @@ public class MusicLoggerApplication {
     private void initGroups(GroupRepository repository) {
         repository.deleteAll();
 
-        Stream.of("Feature", "NewBin", "Library", "Recurrent")
+        Stream.of("Feature", "NewBin", "Library", "Recurrent", "Event")
                 .forEach(group -> repository.save(new Group(group, Date.valueOf("2022-2-7"), Date.valueOf("2022-2-7"))));
 
     }
@@ -60,11 +60,11 @@ public class MusicLoggerApplication {
         var list =  List.of("Zen (with K.Flay & grandson)", "Level of Concern", "OK", "how will i rest in peace if i'm buried by a highway?//", "Is Everybody Going Crazy?", "Real Long Time", "Dead Horse", "Brooklyn Bridge To Chorus", "Cathedral Bell", "All Your Love", "OK OK", "Dream World", "friends*", "Alaska", "The Garden", "Beautiful Anyway", "rock bottom", "Disaster Party", "Kangaroo", "CFS", "Out Of Style", "Heat Seeker", "Not OK!", "Let Me Down", "That's It", "Sayonara", "Caution - Radio Edit", "Love's Not Enough", "Weird!", "Mayday!!! Fiesta Fever", "Give A Little Bit More (Disaster)", "Troublemaker", "If You’re Too Shy (Let Me Know) - Edit", "Starz", "Deleter", "Hollywood", "Hero", "Lie Out Loud", "If That's Alright", "Bad Vacation", "Hallucinogenics", "Upside Down", "Come On Out", "Pretty Lady", "Summer of Love (feat. The Griswolds)", "The Steps", "Anything Could Happen", "Used To Like", "Stand", "On Our Own", "Lonely", "loneliness for love", "If I Want To", "Someone Else", "Aries (feat. Peter Hook and Georgia)", "Black Madonna", "I'm Not Having Any Fun", "slowdown", "", "Light at the End of the Tunnel", "Like It Like This", "Invincible", "Who’s Gonna Love Me Now", "everyone blooms", "Big Shot", "Multiply", "Van Horn", "Weirdo", "Pedestal", "August", "Half Your Age", "Strange Clouds", "Cradles", "Beautiful Faces", "Strangers", "Cyanide", "Forever", "Dead Weight", "Careless", "Karma", "The Apartment", "Good Old Days", "Be Your Drug", "Basement", "Dance Of The Clairvoyants", "Time Moves On", "Bang!", "Everyone Knows", "Caught In The Middle", "February", "Death Rattle", "I Want More", "Want What You Got", "Hometown Heroes", "I Just Wanna Shine", "Valentine", "More", "15 Years", "melancholyism.", "Your Girlfriend");
 
 
-        var date = new java.util.Date(122, Calendar.JANUARY, 1);
+        var date = new java.util.Date(122, Calendar.JANUARY, 1, 2, 42);
         var mills = date.getTime();
         System.out.println("mills = " + mills);
         for (int i = 0; i < list.size(); i++) {
-            repository.save(new Track("Artist " + i, list.get(i), new Timestamp(mills), false, null, new Date(mills), new Date(mills)));
+            repository.save(new Track("Artist " + i, list.get(i), new Timestamp(mills), null));
             mills += 86400000; // 1 day
         }
     }
