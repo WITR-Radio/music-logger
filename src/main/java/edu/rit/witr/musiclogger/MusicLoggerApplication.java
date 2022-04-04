@@ -11,15 +11,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 @SpringBootApplication
 @EntityScan({"edu.rit.witr.musiclogger.entities"})
+@EnableAsync
 public class MusicLoggerApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MusicLoggerApplication.class);
@@ -44,6 +48,17 @@ public class MusicLoggerApplication {
                 LOGGER.info(track.toString());
             }
         };
+    }
+
+    @Bean
+    public Executor taskExecutor() {
+        var executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(7); // mike said this should be 7
+        executor.setMaxPoolSize(Integer.MAX_VALUE);
+        executor.setQueueCapacity(Integer.MAX_VALUE);
+        executor.setThreadNamePrefix("MusicLogger-");
+        executor.initialize();
+        return executor;
     }
 
     private void initGroups(GroupRepository repository) {

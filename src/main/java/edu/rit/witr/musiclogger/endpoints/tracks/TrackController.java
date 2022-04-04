@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -133,25 +135,25 @@ public class TrackController {
     }
 
     @PostMapping("/tracks/broadcast")
-    public ResponseEntity<?> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
+    @Async
+    public CompletableFuture<ResponseEntity<?>> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Broadcasting: {}", broadcasting);
 
         if (!broadcasting.validate()) {
-            return EndpointUtility.badRequest("title, artist and group parameters must all be non-null");
+            return CompletableFuture.completedFuture(EndpointUtility.badRequest("title, artist and group parameters must all be non-null"));
         }
 
         var groupOptional = findGroup(broadcasting.getGroup());
         if (groupOptional.isEmpty()) {
-            return EndpointUtility.badRequest("Invalid group");
+            return CompletableFuture.completedFuture(EndpointUtility.badRequest("Invalid group"));
         }
 
         var track = broadcasting.toTrack(groupOptional.get());
         trackRepository.save(track);
 
-        // TODO: Handle async
-        broadcastService.broadcastTrack(broadcasting);
-
-        return EndpointUtility.ok(Map.of("message", "ok"));
+        // TODO: Properly handle async?
+        return broadcastService.broadcastTrack(broadcasting, underground)
+                .thenApply($ -> EndpointUtility.ok(Map.of("message", "ok")));
     }
 
     /**

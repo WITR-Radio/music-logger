@@ -14,9 +14,10 @@ public interface Broadcaster {
      * Broadcasts the given track to the implementation-specific service.
      *
      * @param track The track to broadcast
+     * @param underground
      * @return The status of the broadcast
      */
-    CompletableFuture<BroadcastStatus> broadcast(BroadcastTrack track);
+    CompletableFuture<BroadcastStatus> broadcast(BroadcastTrack track, boolean underground);
 
     /**
      * Gets the name of the third-party service this is being broadcasted to.
@@ -25,12 +26,6 @@ public interface Broadcaster {
      */
     String getName();
 
-    /*
-    Icecast updating
-    RDS
-    tunein
-     */
-
     /**
      * The response of a broadcast request.
      *
@@ -38,6 +33,14 @@ public interface Broadcaster {
      * @param error Non-null if `success` is true, this contains any information that may be useful for
      *              debugging/showing why the error occurred.
      */
-    record BroadcastStatus(boolean success, @Nullable String error) {}
+    record BroadcastStatus(boolean success, @Nullable String error) {
+
+        /**
+         * A successful status with a null {@link #error}.
+         */
+        BroadcastStatus() {
+            this(false, null);
+        }
+    }
 
 }

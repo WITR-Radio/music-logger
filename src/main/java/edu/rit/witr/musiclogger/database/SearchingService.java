@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * A service to search the database.
+ * TODO: Should this be explicitly async?
  */
 public interface SearchingService {
 

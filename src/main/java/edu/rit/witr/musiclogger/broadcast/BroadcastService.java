@@ -14,8 +14,9 @@ public interface BroadcastService {
      * broadcasting. If multiple broadcasters are present, order should not matter.
      *
      * @param track The track to broadcast
+     * @param underground If the broadcasted track is on underground
      * @return The {@link CompletableFuture} for all combined broadcasters
      */
-    CompletableFuture<Void> broadcastTrack(BroadcastTrack track);
+    CompletableFuture<Void> broadcastTrack(BroadcastTrack track, boolean underground);
 
 }
