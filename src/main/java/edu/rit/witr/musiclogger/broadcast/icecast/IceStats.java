@@ -6,6 +6,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
+/**
+ * A mapping of the XML body from the {@link edu.rit.witr.musiclogger.broadcast.IcecastBroadcaster#LISTMOUNTS_URL}
+ * endpoint.
+ */
 @XmlType
 @XmlRootElement(name = "icestats")
 public class IceStats {
@@ -55,7 +59,7 @@ public class IceStats {
         }
 
         @XmlAttribute(name = "mount", required = true)
-        public void setImportance(String mount) {
+        public void setMount(String mount) {
             this.mount = mount;
         }
 

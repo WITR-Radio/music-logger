@@ -26,6 +26,11 @@ public class ExternalBroadcastService implements BroadcastService {
 
     private final List<Broadcaster> broadcasters;
 
+    /**
+     * Creates an {@link ExternalBroadcastService} and creates the internal {@link Broadcaster}s. This is an intensive
+     * constructor, that should be replaced with a factory. This should only be invoked by Spring though, so it is not
+     * a priority.
+     */
     public ExternalBroadcastService() {
         this.broadcasters = Stream.of(RDSBroadcaster.create(), IcecastBroadcaster.create(), TuneInBroadcaster.create())
                 .filter(Optional::isPresent)
@@ -38,6 +43,13 @@ public class ExternalBroadcastService implements BroadcastService {
     @Override
     public CompletableFuture<Void> broadcastTrack(BroadcastTrack track, boolean underground) {
         return CompletableFuture.allOf(broadcasters.stream()
+                        .filter(broadcaster -> {
+                            if (broadcaster.restrictToFM()) {
+                                return !underground;
+                            }
+
+                            return true;
+                        })
                 .map(broadcaster -> broadcaster.broadcast(track, underground))
                 .toArray(CompletableFuture[]::new));
     }

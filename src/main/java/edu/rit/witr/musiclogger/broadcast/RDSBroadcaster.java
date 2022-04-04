@@ -18,9 +18,41 @@ public class RDSBroadcaster implements Broadcaster {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDSBroadcaster.class);
 
+
+    /**
+     * The command for the artist name to be displayed.
+     * Usage:
+     * <code>
+     *     sendRds(ARTIST + "artist name")
+     * </code>
+     */
     private static final String ARTIST = "ARTISTNAME=";
+
+    /**
+     * The command for the song title to be displayed.
+     * Usage:
+     * <code>
+     *     sendRds(SONG + "song title")
+     * </code>
+     */
     private static final String SONG = "SONGTITLE=";
+
+    /**
+     * The duration of the track. In the old python script, this was an unbounded integer, however in the manual, it
+     * specifies this as a minute:second formatted string (e.g. 3:34).
+     *
+     * Values of 0 and 1 are exceptions, check the manual for details.
+     *
+     * Usage:
+     * <code>
+     *     sendRds(DURATION + "3:34")
+     * </code>
+     */
     private static final String DURATION = "DURATION=";
+
+    /**
+     * The default duration. This isn't actually used, so it can pretty much be whatever.
+     */
     private static final int DEFAULT_DURATION = 500;
 
     private final InetAddress address;
@@ -68,6 +100,7 @@ public class RDSBroadcaster implements Broadcaster {
     // TODO: I'm unsure how to detect error handling, the old python script checked if the response was
     //       a "+" but I can't find the documentation on that anywhere.
     private void sendRds(String message) throws IOException {
+        message += "\r"; // TODO: \n might be necessary after this. The old python script appended \r\n but Mike's used only \r
         var buffer = message.getBytes(StandardCharsets.UTF_8);
         var packet = new DatagramPacket(buffer, buffer.length, address, port);
         var datagramSocket = new DatagramSocket();
@@ -77,5 +110,10 @@ public class RDSBroadcaster implements Broadcaster {
     @Override
     public String getName() {
         return "RDS";
+    }
+
+    @Override
+    public boolean restrictToFM() {
+        return true;
     }
 }

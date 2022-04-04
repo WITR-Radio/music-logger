@@ -94,6 +94,14 @@ public class IcecastBroadcaster implements Broadcaster {
                 });
     }
 
+    /**
+     * Sends an update to Icecast with a specific mount, found by listing {@link #LISTMOUNTS_URL}.
+     *
+     * @param mount The mount point (e.g. "witr-hockey-mp3", "witr-mobile", etc.)
+     * @param song The song name to send
+     * @param underground If this request is being performed on underground (used only for logging purposes)
+     * @return The {@link CompletableFuture} of the request
+     */
     private CompletableFuture<Void> updateIcecast(String mount, String song, boolean underground) {
         try {
             var uri = new URIBuilder(META_URL)
@@ -125,6 +133,11 @@ public class IcecastBroadcaster implements Broadcaster {
     @Override
     public String getName() {
         return "Icecast";
+    }
+
+    @Override
+    public boolean restrictToFM() {
+        return false;
     }
 
     static class IcecastAuthenticator extends Authenticator {

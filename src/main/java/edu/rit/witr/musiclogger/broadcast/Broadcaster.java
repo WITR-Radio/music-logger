@@ -27,11 +27,19 @@ public interface Broadcaster {
     String getName();
 
     /**
+     * Returns if this broadcaster should be restricted to the FM station (true), or if it may be used by Underground
+     * as well (false).
+     *
+     * @return If this broadcaster is restricted to the FM stream
+     */
+    boolean restrictToFM();
+
+    /**
      * The response of a broadcast request.
      *
      * @param success If the broadcast is successful
-     * @param error Non-null if `success` is true, this contains any information that may be useful for
-     *              debugging/showing why the error occurred.
+     * @param error Non-null if `success` is true, this contains a short message of why the error occurred. Generally,
+     *              more information should be available in the error console (e.g. stack traces, params, etc.)
      */
     record BroadcastStatus(boolean success, @Nullable String error) {
 

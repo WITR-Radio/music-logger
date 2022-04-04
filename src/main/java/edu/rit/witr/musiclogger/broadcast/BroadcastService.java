@@ -11,7 +11,8 @@ public interface BroadcastService {
 
     /**
      * Handles the broadcasting of a given track. If one of multiple broadcasts are unsuccessful, do not halt
-     * broadcasting. If multiple broadcasters are present, order should not matter.
+     * broadcasting. If multiple broadcasters are present, order should not matter. If an internal {@link Broadcaster}
+     * is restricted to FM and <code>underground</code> is <code>true</code>, the broadcaster will be skipped.
      *
      * @param track The track to broadcast
      * @param underground If the broadcasted track is on underground
