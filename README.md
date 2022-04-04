@@ -8,4 +8,6 @@ Required environment variables:
 ```
 ICECAST_USER - The Icecast username 
 ICECAST_PASS - The Icecast password
+RDS_IP - The IP of the RDS
+RDS_PORT - The port that RDS uses
 ```

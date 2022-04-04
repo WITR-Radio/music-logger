@@ -36,10 +36,19 @@ public interface Broadcaster {
     record BroadcastStatus(boolean success, @Nullable String error) {
 
         /**
+         * An erroneous status with a given {@link #error}.
+         *
+         * @param error The error message
+         */
+        BroadcastStatus(String error) {
+            this(false, error);
+        }
+
+        /**
          * A successful status with a null {@link #error}.
          */
         BroadcastStatus() {
-            this(false, null);
+            this(true, null);
         }
     }
 

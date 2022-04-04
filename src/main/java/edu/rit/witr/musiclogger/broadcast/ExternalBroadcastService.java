@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -31,7 +32,7 @@ public class ExternalBroadcastService implements BroadcastService {
                 .<Broadcaster>map(Optional::get)
                 .toList();
 
-        LOGGER.info("{}/{} Broadcasters loaded", broadcasters.size(), 3);
+        LOGGER.info("Broadcasters loaded: {}", broadcasters.stream().map(Broadcaster::getName).collect(Collectors.joining(", ")));
     }
 
     @Override

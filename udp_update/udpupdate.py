@@ -45,8 +45,9 @@ def post_logger(artist, song, group):
 
 # TODO: This really should be rewritten
 class UDPListener(DatagramProtocol):
-    def datagramReceived(self, data, (host, port)):
+    def datagramReceived(self, data, foo):
         global LAST_SONG
+        (host, port) = foo
         syslog.syslog("received %r from %s:%d" % (data, host, port))
         stripdata = data.split()
         # This nasty bit actually seperates the song from the artist by the ---

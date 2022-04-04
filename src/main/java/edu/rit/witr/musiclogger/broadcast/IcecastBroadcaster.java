@@ -89,7 +89,7 @@ public class IcecastBroadcaster implements Broadcaster {
                         return new BroadcastStatus();
                     } catch (JAXBException e) {
                         LOGGER.error("An error occurred while decoding Icecast XML response", e);
-                        return new BroadcastStatus(false, "An error occurred while decoding Icecast XML response: " + e.getMessage());
+                        return new BroadcastStatus("An error occurred while decoding Icecast XML response: " + e.getMessage());
                     }
                 });
     }
