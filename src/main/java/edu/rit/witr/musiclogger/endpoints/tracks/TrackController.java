@@ -2,6 +2,7 @@ package edu.rit.witr.musiclogger.endpoints.tracks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.rit.witr.musiclogger.broadcast.BroadcastService;
 import edu.rit.witr.musiclogger.database.SearchingService;
 import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
 import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
@@ -29,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,13 +48,15 @@ public class TrackController {
     private final GroupRepository groupRepository;
     private final TrackUpdater trackUpdater;
     private final ObjectMapper mapper;
+    private final BroadcastService broadcastService;
 
-    public TrackController(@Autowired SearchingService searchingService, @Autowired TrackRepository trackRepository, @Autowired GroupRepository groupRepository, @Autowired TrackUpdater trackUpdater, ObjectMapper mapper) {
+    public TrackController(@Autowired SearchingService searchingService, @Autowired TrackRepository trackRepository, @Autowired GroupRepository groupRepository, @Autowired TrackUpdater trackUpdater, ObjectMapper mapper, @Autowired BroadcastService broadcastService) {
         this.searchingService = searchingService;
         this.trackRepository = trackRepository;
         this.groupRepository = groupRepository;
         this.trackUpdater = trackUpdater;
         this.mapper = mapper;
+        this.broadcastService = broadcastService;
     }
 
     @GetMapping("/tracks/list")
@@ -82,7 +86,7 @@ public class TrackController {
             return EndpointUtility.badRequest("created_at must be a positive integer");
         }
 
-        var groupOptional = findGroup(adding);
+        var groupOptional = findGroup(adding.getGroup());
         if (groupOptional.isEmpty()) {
             return EndpointUtility.badRequest("Invalid group");
         }
@@ -114,7 +118,7 @@ public class TrackController {
 
         Group group = null;
         if (updating.getGroup() != null) {
-            var groupOptional = findGroup(updating);
+            var groupOptional = findGroup(updating.getGroup());
             if (groupOptional.isEmpty()) {
                 return EndpointUtility.badRequest("Invalid group");
             }
@@ -128,16 +132,39 @@ public class TrackController {
         return new ResponseEntity<>(trackRepository.findById(updating.getId()), HttpStatus.OK);
     }
 
+    @PostMapping("/tracks/broadcast")
+    public ResponseEntity<?> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
+        LOGGER.info("Broadcasting: {}", broadcasting);
+
+        if (!broadcasting.validate()) {
+            return EndpointUtility.badRequest("title, artist and group parameters must all be non-null");
+        }
+
+        var groupOptional = findGroup(broadcasting.getGroup());
+        if (groupOptional.isEmpty()) {
+            return EndpointUtility.badRequest("Invalid group");
+        }
+
+        var track = broadcasting.toTrack(groupOptional.get());
+        trackRepository.save(track);
+
+        // TODO: Handle async
+        broadcastService.broadcastTrack(broadcasting);
+
+        return EndpointUtility.ok(Map.of("message", "ok"));
+    }
+
     /**
-     * Looks through the database and finds the {@link Group} that is owned by the {@link AddedTrack}.
+     * Looks through the database and finds the {@link Group} that's name matches with the given string (case
+     * -insensitive).
      *
-     * @param track The track to get the group of
+     * @param groupName The group name to look up
      * @return The {@link Group}, if found
      */
-    private Optional<Group> findGroup(AddedTrack track) {
+    private Optional<Group> findGroup(String groupName) {
         return groupRepository.findAll()
                 .stream()
-                .filter(group -> group.getName().equalsIgnoreCase(track.getGroup()))
+                .filter(group -> group.getName().equalsIgnoreCase(groupName))
                 .findFirst();
     }
 
