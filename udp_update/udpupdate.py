@@ -18,6 +18,7 @@ Lo-Fi Changelog
 * 2018-06-01 (mxc9798/Mike Canning) Pushing newer version in use in Studio X with a few bug fixes
 * 2020-05-27 (wel2138/William Leuschner) Update to modern Python coding standards, fix logger URL, use a proper XML generator, use requests instead of urllib directly
 * 2022-04-03 (aty3425/Adam Yarris) Removed icecast/rds updating (to be moved to the logger), and changed logger posting to JSON
+* 2022-04-05 (mtv6332/Mike Vasile) Updated logger URL
 """
 import syslog
 import requests
@@ -28,9 +29,9 @@ UNDERGROUND = False
 
 ##Globals - CHANGE THESE.##
 if UNDERGROUND:
-    LOGGER2_FULL_URL = "https://moonbounce.rit.edu/tracks/broadcast?underground=true"
+    LOGGER2_FULL_URL = "https://witr-srv-web-2.rit.edu/tracks/broadcast?underground=true"
 else:
-    LOGGER2_FULL_URL = "https://moonbounce.rit.edu/tracks/broadcast"
+    LOGGER2_FULL_URL = "https://witr-srv-web-2.rit.edu/tracks/broadcast"
 LAST_SONG = ""
 
 def post_logger(artist, song, group):
