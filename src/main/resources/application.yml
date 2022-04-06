@@ -1,5 +1,5 @@
 server:
-  port: 5000
+  port: ${OUTBOUND_PORT}
 spring:
   datasource:
     url: ${POSTGRES_URL}
@@ -16,7 +16,7 @@ spring:
         search:
           backend:
             type: elasticsearch
-            uris: http://localhost:9200
+            uris: ${ELASTICSEARCH_URL}
             schema_management:
               minimal_required_status: yellow
               strategy: drop-and-create

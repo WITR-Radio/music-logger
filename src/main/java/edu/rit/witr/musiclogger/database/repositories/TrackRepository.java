@@ -1,72 +1,83 @@
 package edu.rit.witr.musiclogger.database.repositories;
 
+import edu.rit.witr.musiclogger.entities.FMTrack;
 import edu.rit.witr.musiclogger.entities.Track;
+import edu.rit.witr.musiclogger.entities.UNDGTrack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * The {@link CrudRepository} for the {@code tracks} table.
+ * A wrapper/delegator for {@link VariantTrackRepository} so the FM/Underground repositories can be automatically
+ * selected instead of dealing with two repository classes at once.
+ *
+ * This class should have all the methods {@link VariantTrackRepository} has.
  */
-public interface TrackRepository extends CrudRepository<Track, Long> {
+@Service
+public class TrackRepository {
 
-    /**
-     * Fetches all {@link Track}s by invoking {@link #findAllByOrderByIdDesc()}.
-     *
-     * @return All {@link Track}s
-     */
-    @NonNull
-    default List<Track> findAll() {
-        return findAllByOrderByIdDesc();
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackRepository.class);
+
+    private final FMTrackRepository fmTrackRepository;
+    private final UNDGTrackRepository undgTrackRepository;
+
+    public TrackRepository(@Autowired FMTrackRepository fmTrackRepository, @Autowired UNDGTrackRepository undgTrackRepository) {
+        this.fmTrackRepository = fmTrackRepository;
+        this.undgTrackRepository = undgTrackRepository;
     }
 
-    /**
-     * Fetches all {@link Track}s by invoking {@link #findAllByOrderByIdDesc(Pageable)}, with {@link Pageable} to
-     * fine-tune results.
-     *
-     * @param pageable The {@link Pageable} for the results
-     * @return Fetched {@link Track}s
-     */
-    @NonNull
-    default List<Track> findAll(Pageable pageable) {
-        return findAllByOrderByIdDesc(pageable);
+    private VariantTrackRepository<?> getRepo(boolean underground) {
+        return underground ? undgTrackRepository : fmTrackRepository;
     }
 
-    /**
-     * Fetches all {@link Track}s ordered by their descending ID.
-     *
-     * @return Fetched {@link Track}s
-     */
-    List<Track> findAllByOrderByIdDesc();
+    public void save(Track track, boolean underground) {
+        if (!underground && track instanceof FMTrack) {
+            fmTrackRepository.save((FMTrack) track);
+        } else if (underground && track instanceof UNDGTrack) {
+            undgTrackRepository.save((UNDGTrack) track);
+        } else {
+            LOGGER.error("underground option and track type mismatch during save(), this is FATAL as a track cannot be added.");
+        }
+    }
 
-    /**
-     * Fetches all {@link Track}s ordered by their descending ID, with {@link Pageable} for fine-tuning results.
-     *
-     * @param pageable The {@link Pageable} for the results
-     * @return Fetched {@link Track}s
-     */
-    List<Track> findAllByOrderByIdDesc(Pageable pageable);
+    public void deleteById(Long id, boolean underground) {
+        getRepo(underground).deleteById(id);
+    }
 
-    /**
-     * Fetches all {@link Track}s between the given {@link Timestamp}s.
-     *
-     * @param start The starting {@link Timestamp}
-     * @param end The ending {@link Timestamp}
-     * @return Fetched {@link Track}s
-     */
-    List<Track> findAllByTimeBetween(Timestamp start, Timestamp end);
+    @NonNull
+    public List<Track> findAll(boolean underground) {
+        return findAllByOrderByIdDesc(underground);
+    }
 
-    /**
-     * Fetches all {@link Track}s between the given {@link Timestamp}s, with {@link Pageable} for fine-tuning results.
-     *
-     * @param start The starting {@link Timestamp}
-     * @param end The ending {@link Timestamp}
-     * @param pageable The {@link Pageable} for the results
-     * @return Fetched {@link Track}s
-     */
-    List<Track> findAllByTimeBetween(Timestamp start, Timestamp end, Pageable pageable);
+    @NonNull
+    public List<Track> findAll(Pageable pageable, boolean underground) {
+        return findAllByOrderByIdDesc(pageable, underground);
+    }
 
+    public List<Track> findAllByOrderByIdDesc(boolean underground) {
+        return (List<Track>) getRepo(underground).findAllByOrderByIdDesc();
+    }
+
+    public List<Track> findAllByOrderByIdDesc(Pageable pageable, boolean underground) {
+        return (List<Track>) getRepo(underground).findAllByOrderByIdDesc(pageable);
+    }
+
+    public List<Track> findAllByTimeBetween(Timestamp start, Timestamp end, boolean underground) {
+        return (List<Track>) getRepo(underground).findAllByTimeBetween(start, end);
+    }
+
+    public List<Track> findAllByTimeBetween(Timestamp start, Timestamp end, Pageable pageable, boolean underground) {
+        return (List<Track>) getRepo(underground).findAllByTimeBetween(start, end, pageable);
+    }
+
+    public Optional<Track> findById(Long id, boolean underground) {
+        return getRepo(underground).findById(id).map(Track.class::cast);
+    }
 }

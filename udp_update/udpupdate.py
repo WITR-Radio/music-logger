@@ -29,15 +29,15 @@ UNDERGROUND = False
 
 ##Globals - CHANGE THESE.##
 if UNDERGROUND:
-    LOGGER2_FULL_URL = "https://witr-srv-web-2.rit.edu/tracks/broadcast?underground=true"
+    LOGGER2_FULL_URL = "http://witr-srv-web-2.rit.edu/tracks/broadcast?underground=true"
 else:
-    LOGGER2_FULL_URL = "https://witr-srv-web-2.rit.edu/tracks/broadcast"
+    LOGGER2_FULL_URL = "http://witr-srv-web-2.rit.edu/tracks/broadcast"
 LAST_SONG = ""
 
 def post_logger(artist, song, group):
     response = requests.post(LOGGER2_FULL_URL, json={
         "artist": artist,
-        "track": song,
+        "title": song,
         "group": group,
     })
 

@@ -53,7 +53,7 @@ public class RDSBroadcaster implements Broadcaster {
     /**
      * The default duration. This isn't actually used, so it can pretty much be whatever.
      */
-    private static final int DEFAULT_DURATION = 500;
+    private static final int DEFAULT_DURATION = 5 * 60;
 
     private final InetAddress address;
     private final int port;

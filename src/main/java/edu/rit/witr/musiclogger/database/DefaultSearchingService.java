@@ -1,8 +1,13 @@
 package edu.rit.witr.musiclogger.database;
 
+import edu.rit.witr.musiclogger.entities.FMTrack;
 import edu.rit.witr.musiclogger.entities.Track;
+import edu.rit.witr.musiclogger.entities.UNDGTrack;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +45,15 @@ public class DefaultSearchingService implements SearchingService {
         LOGGER.info("Getting entity manager stuff...");
         SearchSession session = Search.session(em);
 
-        return session.search(Track.class)
+        SearchQuerySelectStep<?, EntityReference, ? extends Track, SearchLoadingOptionsStep, ?, ?> searching;
+
+        if (underground) {
+            searching = session.search(UNDGTrack.class);
+        } else {
+            searching = session.search(FMTrack.class);
+        }
+
+        return (List<Track>) searching
                 .where(f -> f.bool(b -> {
                     b.must(f.matchAll());
 

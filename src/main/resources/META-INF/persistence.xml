@@ -5,7 +5,8 @@
     <persistence-unit name="edu.rit.witr.musiclogger.persist.Track">
         <description>Hibernate EntityManager Demo</description>
         <class>edu.rit.witr.musiclogger.entities.Group</class>
-        <class>edu.rit.witr.musiclogger.entities.Track</class>
+        <class>edu.rit.witr.musiclogger.entities.FMTrack</class>
+        <class>edu.rit.witr.musiclogger.entities.UNDGTrack</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL92Dialect"/>

@@ -1,7 +1,9 @@
 package edu.rit.witr.musiclogger.endpoints.tracks;
 
+import edu.rit.witr.musiclogger.entities.FMTrack;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import edu.rit.witr.musiclogger.entities.UNDGTrack;
 import org.springframework.lang.Nullable;
 
 import java.sql.Timestamp;
@@ -37,10 +39,16 @@ public class AddedTrack implements Validatable {
      * and valid.
      *
      * @param group The group to pair the {@link Track} with
+     * @param underground If {@code true} this will create a {@link UNDGTrack}, if {@code false} it will make a
+     *                    {@link FMTrack}
      * @return The {@link Track}
      */
-    public Track toTrack(@Nullable Group group) {
-        return new Track(artist, title, new Timestamp(time), group);
+    public Track toTrack(@Nullable Group group, boolean underground) {
+        if (underground) {
+            return new UNDGTrack(artist, title, new Timestamp(time), group);
+        } else {
+            return new FMTrack(artist, title, new Timestamp(time), group);
+        }
     }
 
     /**

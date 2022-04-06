@@ -6,19 +6,15 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import java.sql.Date;
+import javax.persistence.MappedSuperclass;
 import java.sql.Timestamp;
 
 // TODO: Add more analyzers for improved searching?
@@ -26,11 +22,12 @@ import java.sql.Timestamp;
 /**
  * An individual track object, stored in the {@code tracks} table.
  */
-@Entity
+//@Entity
 @Indexed
-@Table(name = "tracks")
+//@Table(name = "tracks")
+@MappedSuperclass
 @JsonSerialize(using = TrackSerializer.class)
-public class Track {
+public abstract class Track {
 
     @Id
     @GenericField(sortable = Sortable.YES)

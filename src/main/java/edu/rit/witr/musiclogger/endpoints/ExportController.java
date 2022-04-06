@@ -1,5 +1,6 @@
 package edu.rit.witr.musiclogger.endpoints;
 
+import edu.rit.witr.musiclogger.database.repositories.FMTrackRepository;
 import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.apache.commons.text.StringEscapeUtils;
@@ -35,10 +36,11 @@ public class ExportController {
     @GetMapping("/api/export")
     ResponseEntity<StreamingResponseBody> export(@RequestParam(required = false) Long start,
                                                  @RequestParam(required = false) Long end,
-                                                 @RequestParam(required = false) Integer limit, // TODO: Limit
-                                                 @RequestParam(defaultValue = "export.csv") String fileName) {
+                                                 @RequestParam(required = false) Integer limit,
+                                                 @RequestParam(defaultValue = "export.csv") String fileName,
+                                                 @RequestParam(defaultValue = "false") boolean underground) {
 
-        var tracks = listTracks(start, end, limit);
+        var tracks = listTracks(start, end, limit, underground);
 
         var responseBody = new StreamingResponseBody() {
             @Override
@@ -71,19 +73,19 @@ public class ExportController {
      * @param limit The amount of tracks to return, {@code null} for all tracks
      * @return The track to be exported
      */
-    private List<Track> listTracks(@Nullable Long start, @Nullable Long end, @Nullable Integer limit) {
+    private List<Track> listTracks(@Nullable Long start, @Nullable Long end, @Nullable Integer limit, boolean underground) {
         if (limit != null) {
             var paging = PageRequest.of(0, limit);
             if (start == null || end == null) {
-                return repository.findAll(paging);
+                return repository.findAll(paging, underground);
             } else {
-                return repository.findAllByTimeBetween(new Timestamp(start), new Timestamp(end), paging);
+                return repository.findAllByTimeBetween(new Timestamp(start), new Timestamp(end), paging, underground);
             }
         } else {
             if (start == null || end == null) {
-                return repository.findAll();
+                return repository.findAll(underground);
             } else {
-                return repository.findAllByTimeBetween(new Timestamp(start), new Timestamp(end));
+                return repository.findAllByTimeBetween(new Timestamp(start), new Timestamp(end), underground);
             }
         }
     }

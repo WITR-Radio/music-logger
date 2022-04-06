@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -32,6 +33,12 @@ public class ExternalBroadcastService implements BroadcastService {
      * a priority.
      */
     public ExternalBroadcastService() {
+        if (!"true".equalsIgnoreCase(System.getenv("BROADCAST_ENABLE"))) {
+            LOGGER.warn("Broadcasting services disabled explicitly! Set BROADCAST_ENABLE to true to enable");
+            this.broadcasters = Collections.emptyList();
+            return;
+        }
+
         this.broadcasters = Stream.of(RDSBroadcaster.create(), IcecastBroadcaster.create(), TuneInBroadcaster.create())
                 .filter(Optional::isPresent)
                 .<Broadcaster>map(Optional::get)

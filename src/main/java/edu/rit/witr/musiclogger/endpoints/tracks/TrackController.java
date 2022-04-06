@@ -93,8 +93,8 @@ public class TrackController {
             return EndpointUtility.badRequest("Invalid group");
         }
 
-        var track = adding.toTrack(groupOptional.get());
-        trackRepository.save(track);
+        var track = adding.toTrack(groupOptional.get(), underground);
+        trackRepository.save(track, underground);
 
         return new ResponseEntity<>(track, HttpStatus.OK);
     }
@@ -102,7 +102,7 @@ public class TrackController {
     @DeleteMapping("/api/tracks/delete")
     public ResponseEntity<?> removeTrack(@RequestParam long id, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Deleting track {}", id);
-        trackRepository.deleteById(id);
+        trackRepository.deleteById(id, underground);
         return EndpointUtility.ok("Deleted track");
     }
 
@@ -131,7 +131,7 @@ public class TrackController {
         Timestamp timestamp = updating.getTime() == null ? null : new Timestamp(updating.getTime());
 
         trackUpdater.updateTrack(updating.getId(), updating.getTitle(), updating.getArtist(), group, timestamp);
-        return new ResponseEntity<>(trackRepository.findById(updating.getId()), HttpStatus.OK);
+        return new ResponseEntity<>(trackRepository.findById(updating.getId(), underground), HttpStatus.OK);
     }
 
     @PostMapping("/api/tracks/broadcast")
@@ -148,8 +148,8 @@ public class TrackController {
             return CompletableFuture.completedFuture(EndpointUtility.badRequest("Invalid group"));
         }
 
-        var track = broadcasting.toTrack(groupOptional.get());
-        trackRepository.save(track);
+        var track = broadcasting.toTrack(groupOptional.get(), underground);
+        trackRepository.save(track, underground);
 
         // TODO: Properly handle async?
         return broadcastService.broadcastTrack(broadcasting, underground)
@@ -210,12 +210,17 @@ public class TrackController {
             query.put("offset", String.valueOf(currAfter + count));
         }
 
+        var queryString = query.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining("&"));
+
+        if (!queryString.isEmpty()) {
+            queryString = "?" + queryString;
+        }
+
         node.putObject("_links")
-                .put("next", request.getRequestURL() + "?" +
-                        query.entrySet()
-                                .stream()
-                                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                                .collect(Collectors.joining("&")));
+                .put("next", request.getRequestURL() + queryString);
         return node;
     }
 }
