@@ -20,7 +20,7 @@ public class GroupController {
         this.repository = repository;
     }
 
-    @GetMapping("/groups/list")
+    @GetMapping("/api/groups/list")
     List<String> listGroups() {
         return repository.findAll()
                 .stream()

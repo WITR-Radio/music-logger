@@ -32,7 +32,7 @@ public class ExportController {
         this.repository = repository;
     }
 
-    @GetMapping("/export")
+    @GetMapping("/api/export")
     ResponseEntity<StreamingResponseBody> export(@RequestParam(required = false) Long start,
                                                  @RequestParam(required = false) Long end,
                                                  @RequestParam(required = false) Integer limit, // TODO: Limit

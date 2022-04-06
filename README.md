@@ -6,6 +6,9 @@ This is a Spring application using PostgreSQL.
 
 Required environment variables:
 ```
+POSTGRES_URL - The jdbc URL (e.g. jdbc:postgresql://localhost:5432/logger)
+POSTGRES_USER - The database username
+POSTGRES_PASS - The database password
 ICECAST_USER - The Icecast username 
 ICECAST_PASS - The Icecast password
 RDS_IP - The IP of the RDS

@@ -61,7 +61,7 @@ public class TrackController {
         this.broadcastService = broadcastService;
     }
 
-    @GetMapping("/tracks/list")
+    @GetMapping("/api/tracks/list")
     public ResponseEntity<ObjectNode> listTracks(HttpServletRequest request,
                                         @RequestParam(required = false) String song,
                                         @RequestParam(required = false) String artist,
@@ -76,7 +76,7 @@ public class TrackController {
         return new ResponseEntity<>(node, HttpStatus.OK);
     }
 
-    @PostMapping("/tracks/add")
+    @PostMapping("/api/tracks/add")
     public ResponseEntity<?> addTrack(@RequestBody AddedTrack adding, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Adding: {}", adding);
 
@@ -99,14 +99,14 @@ public class TrackController {
         return new ResponseEntity<>(track, HttpStatus.OK);
     }
 
-    @DeleteMapping("/tracks/delete")
+    @DeleteMapping("/api/tracks/delete")
     public ResponseEntity<?> removeTrack(@RequestParam long id, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Deleting track {}", id);
         trackRepository.deleteById(id);
         return EndpointUtility.ok("Deleted track");
     }
 
-    @PatchMapping("/tracks/update")
+    @PatchMapping("/api/tracks/update")
     public ResponseEntity<?> updateTrack(@RequestBody UpdatingTrack updating, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Updating: {}", updating);
 
@@ -134,7 +134,7 @@ public class TrackController {
         return new ResponseEntity<>(trackRepository.findById(updating.getId()), HttpStatus.OK);
     }
 
-    @PostMapping("/tracks/broadcast")
+    @PostMapping("/api/tracks/broadcast")
     @Async
     public CompletableFuture<ResponseEntity<?>> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
         LOGGER.info("Broadcasting: {}", broadcasting);

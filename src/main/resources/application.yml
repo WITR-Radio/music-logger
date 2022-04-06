@@ -1,8 +1,10 @@
+server:
+  port: 5000
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/logger
-    username: postgres
-    password: pass
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASS}
   jpa:
     show-sql: true
     generate-ddl: true
