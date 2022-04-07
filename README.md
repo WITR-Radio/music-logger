@@ -19,4 +19,5 @@ TUNEIN_PARTNER_ID - The TuneIn partner ID
 TUNEIN_PARTNER_KEY - The TuneIn partner API key
 TUNEIN_STATION_ID - The TuneIn station ID
 SPOTIFY_ACCESS_TOKEN - A spotify developer application access token
+INDEX_URL - The URL of the index, with no trailing slash. e.g. http://localhost:8080
 ```

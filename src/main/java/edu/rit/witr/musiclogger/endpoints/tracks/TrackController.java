@@ -10,6 +10,7 @@ import edu.rit.witr.musiclogger.database.repositories.TrackUpdater;
 import edu.rit.witr.musiclogger.endpoints.EndpointUtility;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import edu.rit.witr.musiclogger.streaming.StreamingManager;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.slf4j.Logger;
@@ -51,14 +52,22 @@ public class TrackController {
     private final TrackUpdater trackUpdater;
     private final ObjectMapper mapper;
     private final BroadcastService broadcastService;
+    private final StreamingManager streamingManager;
 
-    public TrackController(@Autowired SearchingService searchingService, @Autowired TrackRepository trackRepository, @Autowired GroupRepository groupRepository, @Autowired TrackUpdater trackUpdater, ObjectMapper mapper, @Autowired BroadcastService broadcastService) {
+    public TrackController(@Autowired SearchingService searchingService,
+                           @Autowired TrackRepository trackRepository,
+                           @Autowired GroupRepository groupRepository,
+                           @Autowired TrackUpdater trackUpdater,
+                           ObjectMapper mapper,
+                           @Autowired BroadcastService broadcastService,
+                           @Autowired StreamingManager streamingManager) {
         this.searchingService = searchingService;
         this.trackRepository = trackRepository;
         this.groupRepository = groupRepository;
         this.trackUpdater = trackUpdater;
         this.mapper = mapper;
         this.broadcastService = broadcastService;
+        this.streamingManager = streamingManager;
     }
 
     @GetMapping("/api/tracks/list")
@@ -72,6 +81,7 @@ public class TrackController {
                                         @RequestParam(defaultValue = "false") boolean underground)
             throws InterruptedException {
         var tracks = searchingService.findAllBy(song, artist, start, end, offset, count, underground);
+        streamingManager.applyLinks(tracks).join(); // TODO: PROPER ASYNC!!
         var node = constructTrackObject(request, tracks, count);
         return new ResponseEntity<>(node, HttpStatus.OK);
     }
@@ -220,7 +230,7 @@ public class TrackController {
         }
 
         node.putObject("_links")
-                .put("next", request.getRequestURL() + queryString);
+                .put("next", System.getenv("INDEX_URL") + "/api/tracks/list" + queryString);
         return node;
     }
 }

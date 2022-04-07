@@ -1,4 +1,6 @@
-package edu.rit.witr.musiclogger.streaming;
+package edu.rit.witr.musiclogger.entities;
+
+import edu.rit.witr.musiclogger.streaming.Services;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -28,8 +30,32 @@ public class StreamingLink {
 
     private String link;
 
-}
+    public StreamingLink() {}
 
-enum Services {
-    SPOTIFY
+    public StreamingLink(String artist, String title, Services service, String link) {
+        this.artist = artist;
+        this.title = title;
+        this.service = service;
+        this.link = link;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Services getService() {
+        return service;
+    }
+
+    public String getLink() {
+        return link;
+    }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import edu.rit.witr.musiclogger.entities.Track;
 
 import java.io.IOException;
+import java.util.Collections;
 
 /**
  * The custom JSON serializer for {@link Track}. This has been implemented to allow for advanced customizability, such
@@ -27,12 +28,21 @@ public class TrackSerializer extends StdSerializer<Track> {
         json.writeNumberField("id", track.getId());
         json.writeStringField("artist", track.getArtist());
         json.writeStringField("title", track.getTitle());
-
-        var time = track.getTime();
-        json.writeStringField("time", time != null ? time.toString() : null); // TODO: What date format?
+        json.writeStringField("time", track.getTime().toString());
 
         var group = track.getGroup();
         json.writeStringField("group", group != null ? group.getName() : null);
+
+        json.writeArrayFieldStart("streaming");
+
+        for (var link : track.getStreamingLinks().orElse(Collections.emptyList())) {
+            json.writeStartObject();
+            json.writeStringField("link", link.getLink());
+            json.writeStringField("service", link.getService().name().toLowerCase());
+            json.writeEndObject();
+        }
+
+        json.writeEndArray();
 
         json.writeEndObject();
     }

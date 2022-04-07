@@ -9,22 +9,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 // TODO: Add more analyzers for improved searching?
 
 /**
  * An individual track object, stored in the {@code tracks} table.
  */
-//@Entity
 @Indexed
-//@Table(name = "tracks")
 @MappedSuperclass
 @JsonSerialize(using = TrackSerializer.class)
 public abstract class Track {
@@ -50,7 +54,10 @@ public abstract class Track {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    // TODO: Original database had `queue_job_id` INT(16) but isn't used anywhere
+    @Nullable
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "streaming_links", nullable = true)
+    private List<StreamingLink> streamingLinks;
 
     public Track() {}
 
@@ -95,6 +102,14 @@ public abstract class Track {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public Optional<List<StreamingLink>> getStreamingLinks() {
+        return Optional.ofNullable(streamingLinks);
+    }
+
+    public void setStreamingLinks(List<StreamingLink> streamingLinks) {
+        this.streamingLinks = streamingLinks;
     }
 
     @Override
