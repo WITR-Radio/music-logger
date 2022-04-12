@@ -7,6 +7,7 @@
         <class>edu.rit.witr.musiclogger.entities.Group</class>
         <class>edu.rit.witr.musiclogger.entities.FMTrack</class>
         <class>edu.rit.witr.musiclogger.entities.UNDGTrack</class>
+        <class>edu.rit.witr.musiclogger.entities.StreamingLink</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL92Dialect"/>

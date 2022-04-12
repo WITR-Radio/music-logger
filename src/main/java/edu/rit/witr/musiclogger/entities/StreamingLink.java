@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-@Entity
+@Entity(name = "streaming_link")
 @Table(name = "streaming", uniqueConstraints={
         @UniqueConstraint(columnNames = {"artist", "title", "service"})
 })

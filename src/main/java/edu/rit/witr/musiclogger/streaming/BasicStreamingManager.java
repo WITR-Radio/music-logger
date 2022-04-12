@@ -30,12 +30,24 @@ public class BasicStreamingManager implements StreamingManager {
 
     @Override
     public CompletableFuture<Void> applyLinks(List<Track> tracks) {
+        LOGGER.info("Applying {}", tracks);
         // Check if every track has a non-null streaming link list. If not, populate it
         return CompletableFuture.allOf(tracks.stream()
-                .filter(track -> track.getStreamingLinks().isEmpty())
-                .map(track -> {
-                    var futures = streamingServices.stream()
-                            .map(serv -> serv.getStreamingLink(track.getTitle(), track.getArtist()))
+                .collect(Collectors.groupingBy(track -> new TrackArtistPair(track.getTitle(), track.getArtist())))
+                .entrySet().stream()
+                .filter(entry -> {
+                    var links = entry.getValue().get(0).getStreamingLinks();
+                    LOGGER.info("({}) links = {}", links.isEmpty(), links);
+                    return links.map(List::isEmpty).orElse(true);
+                })
+                .map(entry -> {
+                    var pair = entry.getKey();
+                    var title = pair.track();
+                    var artist = pair.artist();
+
+                    LOGGER.info("Applying for {}", title);
+                    var futures = (CompletableFuture<Optional<StreamingLink>>[]) streamingServices.stream()
+                            .map(serv -> serv.getStreamingLink(title, artist))
                             .<CompletableFuture<Optional<StreamingLink>>>toArray(CompletableFuture[]::new);
 
                     return CompletableFuture.allOf(futures)
@@ -44,7 +56,10 @@ public class BasicStreamingManager implements StreamingManager {
                                     .filter(Optional::isPresent)
                                     .map(Optional::get)
                                     .toList())
-                            .thenAccept(track::setStreamingLinks); // Is thread safety a concern here, given the context?
+                            .thenAccept(links -> entry.getValue()
+                                    .forEach(track -> track.setStreamingLinks(links))); // Is thread safety a concern here, given the context?
                 }).toArray(CompletableFuture[]::new));
     }
+
+    record TrackArtistPair(String track, String artist) {}
 }
