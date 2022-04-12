@@ -1,5 +1,6 @@
 package edu.rit.witr.musiclogger.database.repositories;
 
+import edu.rit.witr.musiclogger.endpoints.SocketHandler;
 import edu.rit.witr.musiclogger.entities.FMTrack;
 import edu.rit.witr.musiclogger.entities.Track;
 import edu.rit.witr.musiclogger.entities.UNDGTrack;
@@ -27,10 +28,12 @@ public class TrackRepository {
 
     private final FMTrackRepository fmTrackRepository;
     private final UNDGTrackRepository undgTrackRepository;
+    private final SocketHandler socketHandler;
 
-    public TrackRepository(@Autowired FMTrackRepository fmTrackRepository, @Autowired UNDGTrackRepository undgTrackRepository) {
+    public TrackRepository(@Autowired FMTrackRepository fmTrackRepository, @Autowired UNDGTrackRepository undgTrackRepository, @Autowired SocketHandler socketHandler) {
         this.fmTrackRepository = fmTrackRepository;
         this.undgTrackRepository = undgTrackRepository;
+        this.socketHandler = socketHandler;
     }
 
     private VariantTrackRepository<?> getRepo(boolean underground) {
@@ -40,8 +43,10 @@ public class TrackRepository {
     public void save(Track track, boolean underground) {
         if (!underground && track instanceof FMTrack) {
             fmTrackRepository.save((FMTrack) track);
+            socketHandler.broadcastTrack(track, false);
         } else if (underground && track instanceof UNDGTrack) {
             undgTrackRepository.save((UNDGTrack) track);
+            socketHandler.broadcastTrack(track, true);
         } else {
             LOGGER.error("underground option and track type mismatch during save(), this is FATAL as a track cannot be added.");
         }
