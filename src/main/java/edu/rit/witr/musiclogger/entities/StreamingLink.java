@@ -30,13 +30,16 @@ public class StreamingLink {
 
     private String link;
 
+    private String albumArt;
+
     public StreamingLink() {}
 
-    public StreamingLink(String artist, String title, Services service, String link) {
+    public StreamingLink(String artist, String title, Services service, String link, String albumArt) {
         this.artist = artist;
         this.title = title;
         this.service = service;
         this.link = link;
+        this.albumArt = albumArt;
     }
 
     public long getId() {
@@ -57,5 +60,9 @@ public class StreamingLink {
 
     public String getLink() {
         return link;
+    }
+
+    public String getAlbumArt() {
+        return albumArt;
     }
 }

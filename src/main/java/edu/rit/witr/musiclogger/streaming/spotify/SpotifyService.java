@@ -10,20 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 public class SpotifyService implements StreamingService {
@@ -95,7 +90,7 @@ public class SpotifyService implements StreamingService {
                 }
 
                 var spotifyTrack = paging.getItems()[0];
-                var streamingLink = new StreamingLink(artist, track, Services.SPOTIFY, "https://open.spotify.com/track/" + translateURI(spotifyTrack.getUri()));
+                var streamingLink = new StreamingLink(artist, track, Services.SPOTIFY, "https://open.spotify.com/track/" + translateURI(spotifyTrack.getUri()), getAlbumArtLink(spotifyTrack.getAlbum()));
                 LOGGER.info("Saving {}", streamingLink);
                 streamingLinkRepository.save(streamingLink);
 
@@ -122,5 +117,14 @@ public class SpotifyService implements StreamingService {
         var colon = spotifyURI.lastIndexOf(":") + 1;
         LOGGER.info("original = {} colon = {} subbed = {}", spotifyURI, colon, spotifyURI.substring(colon));
         return spotifyURI.substring(colon);
+    }
+
+    private String getAlbumArtLink(AlbumSimplified album) {
+        LOGGER.info("Image sizes:");
+        for (Image image : album.getImages()) {
+            LOGGER.info("\t[{}x{}] {}", image.getWidth(), image.getHeight(), image.getUrl());
+        }
+
+        return album.getImages()[album.getImages().length - 1].getUrl();
     }
 }

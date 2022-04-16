@@ -38,6 +38,7 @@ public class TrackSerializer extends StdSerializer<Track> {
         for (var link : track.getStreamingLinks().orElse(Collections.emptyList())) {
             json.writeStartObject();
             json.writeStringField("link", link.getLink());
+            json.writeStringField("artwork", link.getAlbumArt());
             json.writeStringField("service", link.getService().name().toLowerCase());
             json.writeEndObject();
         }
