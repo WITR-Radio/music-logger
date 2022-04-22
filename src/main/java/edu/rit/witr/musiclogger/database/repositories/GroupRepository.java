@@ -11,6 +11,8 @@ import java.util.List;
  */
 public interface GroupRepository extends CrudRepository<Group, Long> {
 
+    List<String> ALLOWED_GROUPS = List.of("music", "event", "specialty show");
+
     /**
      * Returns all {@link Group}s in the database.
      *
@@ -18,5 +20,11 @@ public interface GroupRepository extends CrudRepository<Group, Long> {
      */
     @NonNull
     List<Group> findAll();
+
+    Group findByName(String name);
+
+    static boolean isValidGroup(Group group) {
+        return ALLOWED_GROUPS.contains(group.getName().toLowerCase());
+    }
 
 }

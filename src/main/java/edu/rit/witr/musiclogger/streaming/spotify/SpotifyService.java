@@ -33,7 +33,6 @@ public class SpotifyService implements StreamingService {
         this.spotifyApi = new SpotifyApi.Builder()
                 .setClientId(System.getenv("SPOTIFY_CLIENT_ID"))
                 .setClientSecret(System.getenv("SPOTIFY_CLIENT_SECRET"))
-//                .setAccessToken(System.getenv("SPOTIFY_ACCESS_TOKEN"))
                 .build();
 
         var clientCredentialsRequest = spotifyApi.clientCredentials().build();
@@ -50,8 +49,6 @@ public class SpotifyService implements StreamingService {
         return CompletableFuture.runAsync(() -> {
             try {
                 var clientCredentials = clientCredentialsRequest.execute();
-                var bruh = clientCredentials.getAccessToken();
-                LOGGER.info("bruh = {}", bruh);
                 spotifyApi.setAccessToken(clientCredentials.getAccessToken());
                 refreshAuth(clientCredentialsRequest, clientCredentials.getExpiresIn());
             } catch (IOException | ParseException | SpotifyWebApiException e) {
@@ -67,14 +64,12 @@ public class SpotifyService implements StreamingService {
             return CompletableFuture.completedFuture(Optional.empty());
         }
 
-        LOGGER.info("Getting streaming for {}, {}", track, artist);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 var all = streamingLinkRepository.findAllByArtistEqualsAndTitleEquals(artist, track);
 
                 // There should only ever be 0-1 found
                 if (!all.isEmpty()) {
-                    LOGGER.info("Found: {}", all);
                     return Optional.of(all.get(0));
                 }
 
@@ -83,15 +78,12 @@ public class SpotifyService implements StreamingService {
                         .execute()
                         .getTracks();
 
-                LOGGER.info("paging total: {}", paging.getTotal());
-
                 if (paging.getTotal() == 0) {
                     return Optional.empty();
                 }
 
                 var spotifyTrack = paging.getItems()[0];
                 var streamingLink = new StreamingLink(artist, track, Services.SPOTIFY, "https://open.spotify.com/track/" + translateURI(spotifyTrack.getUri()), getAlbumArtLink(spotifyTrack.getAlbum()));
-                LOGGER.info("Saving {}", streamingLink);
                 streamingLinkRepository.save(streamingLink);
 
                 return Optional.of(streamingLink);
@@ -115,16 +107,10 @@ public class SpotifyService implements StreamingService {
      */
     private String translateURI(String spotifyURI) {
         var colon = spotifyURI.lastIndexOf(":") + 1;
-        LOGGER.info("original = {} colon = {} subbed = {}", spotifyURI, colon, spotifyURI.substring(colon));
         return spotifyURI.substring(colon);
     }
 
     private String getAlbumArtLink(AlbumSimplified album) {
-        LOGGER.info("Image sizes:");
-        for (Image image : album.getImages()) {
-            LOGGER.info("\t[{}x{}] {}", image.getWidth(), image.getHeight(), image.getUrl());
-        }
-
         return album.getImages()[album.getImages().length - 1].getUrl();
     }
 }

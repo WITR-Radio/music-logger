@@ -25,7 +25,7 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketHandler.class);
 
-    private final Executor broadcastExecutor = Executors.newSingleThreadExecutor();
+    private final Executor broadcastExecutor = Executors.newCachedThreadPool();
 
     private final List<WebSocketSession> undergroundSessions = new CopyOnWriteArrayList<>();
     private final List<WebSocketSession> fmSessions = new CopyOnWriteArrayList<>();

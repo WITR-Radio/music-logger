@@ -88,8 +88,7 @@ public class TrackUpdater {
 
         setParam(query, "id", Long.class, id);
 
-        var bruh = query.executeUpdate();
-        LOGGER.info("Updated {}", bruh);
+        query.executeUpdate();
     }
 
     private <T> void setParam(Query query, String name, Class<T> type, @Nullable T value) {

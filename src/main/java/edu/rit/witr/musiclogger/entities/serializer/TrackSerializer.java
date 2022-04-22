@@ -3,7 +3,12 @@ package edu.rit.witr.musiclogger.entities.serializer;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
+import edu.rit.witr.musiclogger.database.repositories.RepositoryService;
+import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -14,12 +19,16 @@ import java.util.Collections;
  */
 public class TrackSerializer extends StdSerializer<Track> {
 
-    public TrackSerializer() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrackSerializer.class);
+
+    private Group defaultGroup = null;
+
+    protected TrackSerializer() {
         this(null);
     }
 
-    protected TrackSerializer(Class<Track> t) {
-        super(t);
+    public TrackSerializer(Class<Track> clazz) {
+        super(clazz);
     }
 
     @Override
@@ -31,7 +40,7 @@ public class TrackSerializer extends StdSerializer<Track> {
         json.writeStringField("time", track.getTime().toString());
 
         var group = track.getGroup();
-        json.writeStringField("group", group != null ? group.getName() : null);
+        json.writeStringField("group", group != null ? convertToValid(group).getName() : null);
 
         json.writeArrayFieldStart("streaming");
 
@@ -46,5 +55,19 @@ public class TrackSerializer extends StdSerializer<Track> {
         json.writeEndArray();
 
         json.writeEndObject();
+    }
+
+    private Group convertToValid(Group group) {
+        if (!GroupRepository.isValidGroup(group)) {
+            if (defaultGroup == null) {
+                var found = RepositoryService.getRepo(GroupRepository.class).findByName("Music");;
+                defaultGroup = found;
+                return defaultGroup;
+            }
+
+            return defaultGroup;
+        }
+
+        return group;
     }
 }

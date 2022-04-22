@@ -24,6 +24,7 @@ public class GroupController {
     List<String> listGroups() {
         return repository.findAll()
                 .stream()
+                .filter(GroupRepository::isValidGroup)
                 .map(Group::getName)
                 .collect(Collectors.toList());
     }

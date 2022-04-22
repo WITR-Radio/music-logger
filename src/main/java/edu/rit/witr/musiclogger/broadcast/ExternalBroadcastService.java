@@ -44,7 +44,7 @@ public class ExternalBroadcastService implements BroadcastService {
                 .<Broadcaster>map(Optional::get)
                 .toList();
 
-        LOGGER.info("Broadcasters loaded: {}", broadcasters.stream().map(Broadcaster::getName).collect(Collectors.joining(", ")));
+        LOGGER.debug("Broadcasters loaded: {}", broadcasters.stream().map(Broadcaster::getName).collect(Collectors.joining(", ")));
     }
 
     @Override

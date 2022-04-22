@@ -26,10 +26,10 @@ public class IndexingService {
      */
     @Transactional
     public void initiateIndexing() throws InterruptedException {
-        LOGGER.info("Initiating indexing...");
+        LOGGER.debug("Initiating indexing...");
         SearchSession session = Search.session(em);
         session.massIndexer().startAndWait();
-        LOGGER.info("All entities indexed");
+        LOGGER.debug("All entities indexed");
     }
 
 }

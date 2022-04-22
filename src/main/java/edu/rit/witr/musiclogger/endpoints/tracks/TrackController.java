@@ -89,7 +89,7 @@ public class TrackController {
 
     @PostMapping("/api/tracks/add")
     public ResponseEntity<?> addTrack(@RequestBody AddedTrack adding, @RequestParam(defaultValue = "false") boolean underground) {
-        LOGGER.info("Adding: {}", adding);
+        LOGGER.debug("Adding: {}", adding);
 
         if (!adding.validate()) {
             return EndpointUtility.badRequest("title, artist, group, and time parameters must all be non-null");
@@ -113,14 +113,14 @@ public class TrackController {
 
     @DeleteMapping("/api/tracks/delete")
     public ResponseEntity<?> removeTrack(@RequestParam long id, @RequestParam(defaultValue = "false") boolean underground) {
-        LOGGER.info("Deleting track {}", id);
+        LOGGER.debug("Deleting track {}", id);
         trackRepository.deleteById(id, underground);
         return EndpointUtility.ok("Deleted track");
     }
 
     @PatchMapping("/api/tracks/update")
     public ResponseEntity<?> updateTrack(@RequestBody UpdatingTrack updating, @RequestParam(defaultValue = "false") boolean underground) {
-        LOGGER.info("Updating: {}", updating);
+        LOGGER.debug("Updating: {}", updating);
 
         if (!updating.validate()) {
             return EndpointUtility.badRequest("id must be non-null");
@@ -149,7 +149,7 @@ public class TrackController {
     @PostMapping("/api/tracks/broadcast")
     @Async
     public CompletableFuture<ResponseEntity<?>> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
-        LOGGER.info("Broadcasting: {}", broadcasting);
+        LOGGER.debug("Broadcasting: {}", broadcasting);
 
         if (!broadcasting.validate()) {
             return CompletableFuture.completedFuture(EndpointUtility.badRequest("title, artist and group parameters must all be non-null"));

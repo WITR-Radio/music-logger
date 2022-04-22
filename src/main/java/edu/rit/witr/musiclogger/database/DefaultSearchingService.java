@@ -42,7 +42,6 @@ public class DefaultSearchingService implements SearchingService {
                                  int offset,
                                  int count,
                                  boolean underground) {
-        LOGGER.info("Getting entity manager stuff...");
         SearchSession session = Search.session(em);
 
         SearchQuerySelectStep<?, EntityReference, ? extends Track, SearchLoadingOptionsStep, ?, ?> searching;

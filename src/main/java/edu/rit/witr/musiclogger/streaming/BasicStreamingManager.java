@@ -25,19 +25,17 @@ public class BasicStreamingManager implements StreamingManager {
     public BasicStreamingManager(@Autowired SpotifyService spotifyService) {
         this.streamingServices = List.of(spotifyService);
 
-        LOGGER.info("Streaming services loaded: {}", streamingServices.stream().map(StreamingService::getName).collect(Collectors.joining(", ")));
+        LOGGER.debug("Streaming services loaded: {}", streamingServices.stream().map(StreamingService::getName).collect(Collectors.joining(", ")));
     }
 
     @Override
     public CompletableFuture<Void> applyLinks(List<Track> tracks) {
-        LOGGER.info("Applying {}", tracks);
         // Check if every track has a non-null streaming link list. If not, populate it
         return CompletableFuture.allOf(tracks.stream()
                 .collect(Collectors.groupingBy(track -> new TrackArtistPair(track.getTitle(), track.getArtist())))
                 .entrySet().stream()
                 .filter(entry -> {
                     var links = entry.getValue().get(0).getStreamingLinks();
-                    LOGGER.info("({}) links = {}", links.isEmpty(), links);
                     return links.map(List::isEmpty).orElse(true);
                 })
                 .map(entry -> {
@@ -45,7 +43,6 @@ public class BasicStreamingManager implements StreamingManager {
                     var title = pair.track();
                     var artist = pair.artist();
 
-                    LOGGER.info("Applying for {}", title);
                     var futures = (CompletableFuture<Optional<StreamingLink>>[]) streamingServices.stream()
                             .map(serv -> serv.getStreamingLink(title, artist))
                             .<CompletableFuture<Optional<StreamingLink>>>toArray(CompletableFuture[]::new);

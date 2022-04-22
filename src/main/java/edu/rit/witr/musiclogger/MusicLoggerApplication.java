@@ -37,17 +37,19 @@ public class MusicLoggerApplication {
     public CommandLineRunner demo(GroupRepository groupRepository, FMTrackRepository trackRepository) {
         return args -> {
 //            initGroups(groupRepository);
-//            initTracks(trackRepository);
+//            initTracks(trackRepository, groupRepository);
 
-            LOGGER.info("All groups:");
+            LOGGER.debug("All groups:");
             for (var group : groupRepository.findAll()) {
                 LOGGER.info(group.toString());
             }
 
-            LOGGER.info("All tracks:");
-            for (var track : trackRepository.findAll()) {
-                LOGGER.info(track.toString());
-            }
+            LOGGER.debug("Started with {} tracks", trackRepository.count());
+
+//            LOGGER.info("All tracks:");
+//            for (var track : trackRepository.findAll()) {
+//                LOGGER.info(track.toString());
+//            }
         };
     }
 
@@ -65,13 +67,15 @@ public class MusicLoggerApplication {
     private void initGroups(GroupRepository repository) {
         repository.deleteAll();
 
-        Stream.of("Feature", "NewBin", "Library", "Recurrent", "Event", "Music", "Specialty")
+        Stream.of("Music", "Event", "Specialty Show")
                 .forEach(group -> repository.save(new Group(group)));
 
     }
 
-    private void initTracks(FMTrackRepository repository) {
+    private void initTracks(FMTrackRepository repository, GroupRepository groupRepository) {
         repository.deleteAll();
+
+        var musicGroup = groupRepository.findByName("Music");
 
         var list =  List.of("Zen (with K.Flay & grandson)", "Level of Concern", "OK", "how will i rest in peace if i'm buried by a highway?//", "Is Everybody Going Crazy?", "Real Long Time", "Dead Horse", "Brooklyn Bridge To Chorus", "Cathedral Bell", "All Your Love", "OK OK", "Dream World", "friends*", "Alaska", "The Garden", "Beautiful Anyway", "rock bottom", "Disaster Party", "Kangaroo", "CFS", "Out Of Style", "Heat Seeker", "Not OK!", "Let Me Down", "That's It", "Sayonara", "Caution - Radio Edit", "Love's Not Enough", "Weird!", "Mayday!!! Fiesta Fever", "Give A Little Bit More (Disaster)", "Troublemaker", "If You’re Too Shy (Let Me Know) - Edit", "Starz", "Deleter", "Hollywood", "Hero", "Lie Out Loud", "If That's Alright", "Bad Vacation", "Hallucinogenics", "Upside Down", "Come On Out", "Pretty Lady", "Summer of Love (feat. The Griswolds)", "The Steps", "Anything Could Happen", "Used To Like", "Stand", "On Our Own", "Lonely", "loneliness for love", "If I Want To", "Someone Else", "Aries (feat. Peter Hook and Georgia)", "Black Madonna", "I'm Not Having Any Fun", "slowdown", "", "Light at the End of the Tunnel", "Like It Like This", "Invincible", "Who’s Gonna Love Me Now", "everyone blooms", "Big Shot", "Multiply", "Van Horn", "Weirdo", "Pedestal", "August", "Half Your Age", "Strange Clouds", "Cradles", "Beautiful Faces", "Strangers", "Cyanide", "Forever", "Dead Weight", "Careless", "Karma", "The Apartment", "Good Old Days", "Be Your Drug", "Basement", "Dance Of The Clairvoyants", "Time Moves On", "Bang!", "Everyone Knows", "Caught In The Middle", "February", "Death Rattle", "I Want More", "Want What You Got", "Hometown Heroes", "I Just Wanna Shine", "Valentine", "More", "15 Years", "melancholyism.", "Your Girlfriend");
 
@@ -80,7 +84,7 @@ public class MusicLoggerApplication {
         var mills = date.getTime();
         System.out.println("mills = " + mills);
         for (int i = 0; i < list.size(); i++) {
-            repository.save(new FMTrack("Artist " + i, list.get(i), new Timestamp(mills), null));
+            repository.save(new FMTrack("Artist " + i, list.get(i), new Timestamp(mills), musicGroup));
             mills += 86400000; // 1 day
         }
     }
