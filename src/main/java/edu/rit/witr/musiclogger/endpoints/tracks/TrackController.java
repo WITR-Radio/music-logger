@@ -53,6 +53,7 @@ public class TrackController {
     private final TrackUpdater trackUpdater;
     private final ObjectMapper mapper;
     private final BroadcastService broadcastService;
+    private final SocketHandler socketHandler;
     private final StreamingManager streamingManager;
 
     public TrackController(@Autowired SearchingService searchingService,
@@ -61,6 +62,7 @@ public class TrackController {
                            @Autowired TrackUpdater trackUpdater,
                            ObjectMapper mapper,
                            @Autowired BroadcastService broadcastService,
+                           @Autowired SocketHandler socketHandler,
                            @Autowired StreamingManager streamingManager) {
         this.searchingService = searchingService;
         this.trackRepository = trackRepository;
@@ -68,6 +70,7 @@ public class TrackController {
         this.trackUpdater = trackUpdater;
         this.mapper = mapper;
         this.broadcastService = broadcastService;
+        this.socketHandler = socketHandler;
         this.streamingManager = streamingManager;
     }
 
@@ -106,7 +109,7 @@ public class TrackController {
 
         var track = adding.toTrack(groupOptional.get(), underground);
         streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
-        trackRepository.save(track, underground);
+        saveTrack(track, underground);
 
         return new ResponseEntity<>(track, HttpStatus.OK);
     }
@@ -161,11 +164,21 @@ public class TrackController {
         }
 
         var track = broadcasting.toTrack(groupOptional.get(), underground);
-        trackRepository.save(track, underground);
+        saveTrack(track, underground);
 
         // TODO: Properly handle async?
         return broadcastService.broadcastTrack(broadcasting, underground)
                 .thenApply($ -> EndpointUtility.ok(Map.of("message", "ok")));
+    }
+
+    @GetMapping("/api/track/current")
+    public ResponseEntity<?> getCurrentTrack(@RequestParam(defaultValue = "false") boolean underground) {
+        return new ResponseEntity<>(trackRepository.getLastTrack(underground), HttpStatus.OK);
+    }
+
+    private void saveTrack(Track track, boolean underground) {
+        trackRepository.save(track, underground);
+        socketHandler.broadcastTrack(track, underground);
     }
 
     /**

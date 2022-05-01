@@ -1,19 +1,23 @@
 package edu.rit.witr.musiclogger.endpoints;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.URI;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -30,15 +34,28 @@ public class SocketHandler extends TextWebSocketHandler {
     private final List<WebSocketSession> undergroundSessions = new CopyOnWriteArrayList<>();
     private final List<WebSocketSession> fmSessions = new CopyOnWriteArrayList<>();
 
+    private final TrackRepository trackRepository;
     private final ObjectMapper objectMapper;
 
-    public SocketHandler(ObjectMapper objectMapper) {
+    public SocketHandler(TrackRepository trackRepository, ObjectMapper objectMapper) {
+        this.trackRepository = trackRepository;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
         getSessions(isUnderground(session)).add(session);
+
+        if (sendInitial(session)) {
+            trackRepository.getLastTrack(false).ifPresent(track -> {
+                try {
+                    var json = objectMapper.writeValueAsString(track);
+                    broadcastTrack(json, session);
+                } catch (IOException e) {
+                    LOGGER.error("An error occurred while sending initial track", e);
+                }
+            });
+        }
     }
 
     @Override
@@ -59,7 +76,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 var json = objectMapper.writeValueAsString(track);
                 getSessions(underground).forEach(session -> {
                     try {
-                        session.sendMessage(new TextMessage(json));
+                        broadcastTrack(json, session);
                     } catch (IOException | IllegalStateException e) {
                         try {
                             session.close();
@@ -76,6 +93,10 @@ public class SocketHandler extends TextWebSocketHandler {
         }, broadcastExecutor);
     }
 
+    private void broadcastTrack(String json, WebSocketSession session) throws IOException {
+        session.sendMessage(new TextMessage(json));
+    }
+
     /**
      * Checks if the given {@link WebSocketSession} is using the underground playlist.
      *
@@ -83,8 +104,17 @@ public class SocketHandler extends TextWebSocketHandler {
      * @return If this is from underground
      */
     private boolean isUnderground(WebSocketSession session) {
-        var decoded = UriComponentsBuilder.fromUri(session.getUri()).build().getQueryParams();
+        var decoded = decodeQuery(session.getUri());
         return decoded.getOrDefault("underground", List.of("")).contains("true");
+    }
+
+    private boolean sendInitial(WebSocketSession session) {
+        var decoded = decodeQuery(session.getUri());
+        return decoded.getOrDefault("sendInitial", List.of("")).contains("false");
+    }
+
+    private MultiValueMap<String, String> decodeQuery(URI uri) {
+        return UriComponentsBuilder.fromUri(uri).build().getQueryParams();
     }
 
     /**

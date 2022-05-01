@@ -7,8 +7,10 @@ import edu.rit.witr.musiclogger.entities.UNDGTrack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -28,12 +30,10 @@ public class TrackRepository {
 
     private final FMTrackRepository fmTrackRepository;
     private final UNDGTrackRepository undgTrackRepository;
-    private final SocketHandler socketHandler;
 
-    public TrackRepository(@Autowired FMTrackRepository fmTrackRepository, @Autowired UNDGTrackRepository undgTrackRepository, @Autowired SocketHandler socketHandler) {
+    public TrackRepository(@Autowired FMTrackRepository fmTrackRepository, @Autowired UNDGTrackRepository undgTrackRepository) {
         this.fmTrackRepository = fmTrackRepository;
         this.undgTrackRepository = undgTrackRepository;
-        this.socketHandler = socketHandler;
     }
 
     private VariantTrackRepository<?> getRepo(boolean underground) {
@@ -43,13 +43,20 @@ public class TrackRepository {
     public void save(Track track, boolean underground) {
         if (!underground && track instanceof FMTrack) {
             fmTrackRepository.save((FMTrack) track);
-            socketHandler.broadcastTrack(track, false);
         } else if (underground && track instanceof UNDGTrack) {
             undgTrackRepository.save((UNDGTrack) track);
-            socketHandler.broadcastTrack(track, true);
         } else {
             LOGGER.error("underground option and track type mismatch during save(), this is FATAL as a track cannot be added.");
         }
+    }
+
+    public Optional<Track> getLastTrack(boolean underground) {
+        var found = (underground ? undgTrackRepository : fmTrackRepository).findAll(PageRequest.of(0, 1));
+        if (found.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(found.get(0));
     }
 
     public void deleteById(Long id, boolean underground) {
