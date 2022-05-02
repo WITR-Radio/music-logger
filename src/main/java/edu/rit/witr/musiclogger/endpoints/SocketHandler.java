@@ -47,14 +47,14 @@ public class SocketHandler extends TextWebSocketHandler {
         getSessions(isUnderground(session)).add(session);
 
         if (sendInitial(session)) {
-            trackRepository.getLastTrack(false).ifPresent(track -> {
+            trackRepository.getLastTrack(false).ifPresentOrElse(track -> {
                 try {
                     var json = objectMapper.writeValueAsString(track);
                     broadcastTrack(json, session);
                 } catch (IOException e) {
                     LOGGER.error("An error occurred while sending initial track", e);
                 }
-            });
+            }, () -> LOGGER.info("Nothing found lol"));
         }
     }
 
@@ -110,7 +110,10 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private boolean sendInitial(WebSocketSession session) {
         var decoded = decodeQuery(session.getUri());
-        return decoded.getOrDefault("sendInitial", List.of("")).contains("false");
+        LOGGER.info("Sending initial? {}", decoded);
+        var res = decoded.getOrDefault("sendInitial", List.of("")).contains("true");
+        LOGGER.info("sending {}", res);
+        return res;
     }
 
     private MultiValueMap<String, String> decodeQuery(URI uri) {

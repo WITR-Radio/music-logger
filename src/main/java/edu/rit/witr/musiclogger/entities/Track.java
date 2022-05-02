@@ -55,7 +55,7 @@ public abstract class Track {
     private Group group;
 
     @Nullable
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "streaming_links", nullable = true)
     private List<StreamingLink> streamingLinks;
 

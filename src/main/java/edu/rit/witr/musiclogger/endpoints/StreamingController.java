@@ -1,7 +1,10 @@
 package edu.rit.witr.musiclogger.endpoints;
 
 import edu.rit.witr.musiclogger.streaming.spotify.SpotifyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Streamable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class StreamingController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamingController.class);
+
     private final SpotifyService spotifyService;
 
     public StreamingController(@Autowired SpotifyService spotifyService) {
@@ -21,7 +26,7 @@ public class StreamingController {
 
     @GetMapping("/api/streaming/lookup")
     public ResponseEntity<?> lookupTrackMeta(HttpServletRequest request, @RequestParam String track, @RequestParam String artist) {
-        if (!System.getenv("STREAMING_API_TOKEN").equals(request.getHeader("Authentication"))) {
+        if (!System.getenv("STREAMING_API_TOKEN").equals(request.getHeader("authorization"))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
@@ -35,7 +40,7 @@ public class StreamingController {
         return new ResponseEntity<>(new ServiceDataDTO(found.getLink(), found.getAlbumArt(), found.getService().getName()), HttpStatus.OK);
     }
 
-    class ServiceDataDTO {
+    static class ServiceDataDTO {
         private final String link;
         private final String artwork;
         private final String service;

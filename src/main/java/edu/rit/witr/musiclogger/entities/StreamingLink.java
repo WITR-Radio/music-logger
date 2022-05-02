@@ -65,4 +65,16 @@ public class StreamingLink {
     public String getAlbumArt() {
         return albumArt;
     }
+
+    @Override
+    public String toString() {
+        return "StreamingLink{" +
+                "id=" + id +
+                ", artist='" + artist + '\'' +
+                ", title='" + title + '\'' +
+                ", service=" + service +
+                ", link='" + link + '\'' +
+                ", albumArt='" + albumArt + '\'' +
+                '}';
+    }
 }
