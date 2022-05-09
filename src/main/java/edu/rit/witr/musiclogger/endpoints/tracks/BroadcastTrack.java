@@ -19,6 +19,10 @@ public class BroadcastTrack implements Validatable {
         this.group = group;
     }
 
+    public BroadcastTrack fromTrack(Track track) { // todo: broadcast from
+        return new BroadcastTrack(track.getTitle(), track.getArtist(), track.getGroup().getName());
+    }
+
     @Override
     public boolean validate() {
         return title != null && artist != null && group != null;

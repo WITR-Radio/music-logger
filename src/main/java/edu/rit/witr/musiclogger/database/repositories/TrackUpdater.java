@@ -42,20 +42,20 @@ public class TrackUpdater {
      * @param artist The new artist of the track
      * @param group The new group of the track
      * @param time The new time of the track
+     * @param underground If the track is an underground track
      */
     @Transactional
     public void updateTrack(long id,
                             @Nullable String title,
                             @Nullable String artist,
                             @Nullable Group group,
-                            @Nullable Timestamp time) {
-        var updatedTime = new Date(System.currentTimeMillis());
+                            @Nullable Timestamp time,
+                            boolean underground) {
         var params = new HashMap<>(Map.<String, Pair<String, Consumer<Query>>>of(
                 "title", Pair.of("t.title = :title", query -> setParam(query, "title", String.class, title)),
                 "artist", Pair.of("t.artist = :artist", query -> setParam(query, "artist", String.class, artist)),
                 "group", Pair.of("t.group = :group", query -> setParam(query, "group", Group.class, group)),
-                "time", Pair.of("t.time = :time", query -> setParam(query, "time", Timestamp.class, time)),
-                "updated", Pair.of("t.updated = :updated", query -> setParam(query, "updated", java.sql.Date.class, updatedTime))));
+                "time", Pair.of("t.time = :time", query -> setParam(query, "time", Timestamp.class, time))));
 
         if (title == null) {
             params.remove("title");
@@ -73,7 +73,7 @@ public class TrackUpdater {
             params.remove("time");
         }
 
-        var queryString = "update Track t set " +
+        var queryString = "update " + (underground ? "tracks_undg" : "tracks") + " t set " +
                 params.values()
                         .stream()
                         .map(Pair::getFirst)

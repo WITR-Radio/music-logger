@@ -143,7 +143,7 @@ public class TrackController {
 
         Timestamp timestamp = updating.getTime() == null ? null : new Timestamp(updating.getTime());
 
-        trackUpdater.updateTrack(updating.getId(), updating.getTitle(), updating.getArtist(), group, timestamp);
+        trackUpdater.updateTrack(updating.getId(), updating.getTitle(), updating.getArtist(), group, timestamp, underground);
         return new ResponseEntity<>(trackRepository.findById(updating.getId(), underground), HttpStatus.OK);
     }
 
@@ -160,6 +160,7 @@ public class TrackController {
                 .orElseGet(() -> findGroup("Music").get());
 
         var track = broadcasting.toTrack(group, underground);
+        streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
         saveTrack(track, underground);
 
         // TODO: Properly handle async?
