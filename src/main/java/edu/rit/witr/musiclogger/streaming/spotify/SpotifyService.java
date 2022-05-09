@@ -111,6 +111,17 @@ public class SpotifyService implements StreamingService {
     }
 
     private String getAlbumArtLink(AlbumSimplified album) {
-        return album.getImages()[album.getImages().length - 1].getUrl();
+        var images = album.getImages();
+        for (var image : images) {
+            if (image.getWidth() <= 300) { // Most common sizes are (in a square) 640, 300, and 64
+                return image.getUrl();
+            }
+        }
+
+        if (album.getImages().length == 0) {
+            return "";
+        }
+
+        return images[album.getImages().length - 1].getUrl();
     }
 }
