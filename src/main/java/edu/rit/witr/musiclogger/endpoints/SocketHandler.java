@@ -44,10 +44,11 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
-        getSessions(isUnderground(session)).add(session);
+        var underground = isUnderground(session);
+        getSessions(underground).add(session);
 
         if (sendInitial(session)) {
-            trackRepository.getLastTrack(false).ifPresentOrElse(track -> {
+            trackRepository.getLastTrack(underground).ifPresentOrElse(track -> {
                 try {
                     var json = objectMapper.writeValueAsString(track);
                     broadcastTrack(json, session);
@@ -110,10 +111,7 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private boolean sendInitial(WebSocketSession session) {
         var decoded = decodeQuery(session.getUri());
-        LOGGER.info("Sending initial? {}", decoded);
-        var res = decoded.getOrDefault("sendInitial", List.of("")).contains("true");
-        LOGGER.info("sending {}", res);
-        return res;
+        return decoded.getOrDefault("sendInitial", List.of("")).contains("true");
     }
 
     private MultiValueMap<String, String> decodeQuery(URI uri) {

@@ -26,6 +26,13 @@ public class GroupController {
                 .stream()
                 .filter(GroupRepository::isValidGroup)
                 .map(Group::getName)
+                .sorted((a, $) -> {
+                    if (a.equalsIgnoreCase("Music")) {
+                        return -1;
+                    }
+
+                    return 0;
+                })
                 .collect(Collectors.toList());
     }
 }

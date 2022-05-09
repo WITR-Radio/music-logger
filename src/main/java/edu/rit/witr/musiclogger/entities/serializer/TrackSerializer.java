@@ -9,6 +9,7 @@ import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -20,8 +21,6 @@ import java.util.Collections;
 public class TrackSerializer extends StdSerializer<Track> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackSerializer.class);
-
-    private Group defaultGroup = null;
 
     protected TrackSerializer() {
         this(null);
@@ -40,7 +39,7 @@ public class TrackSerializer extends StdSerializer<Track> {
         json.writeStringField("time", track.getTime().toString());
 
         var group = track.getGroup();
-        json.writeStringField("group", group != null ? convertToValid(group).getName() : null);
+        json.writeStringField("group", convertToValidName(group));
 
         json.writeArrayFieldStart("streaming");
 
@@ -57,17 +56,17 @@ public class TrackSerializer extends StdSerializer<Track> {
         json.writeEndObject();
     }
 
-    private Group convertToValid(Group group) {
-        if (!GroupRepository.isValidGroup(group)) {
-            if (defaultGroup == null) {
-                var found = RepositoryService.getRepo(GroupRepository.class).findByName("Music");;
-                defaultGroup = found;
-                return defaultGroup;
-            }
-
-            return defaultGroup;
+    /**
+     * If the given {@link Group} is not null and is valid, return its name. Otherwise, return "Music".
+     *
+     * @param group The group to check
+     * @return The valid group name
+     */
+    private String convertToValidName(@Nullable Group group) {
+        if (group != null && GroupRepository.isValidGroup(group)) {
+            return group.getName();
         }
 
-        return group;
+        return "Music";
     }
 }

@@ -12,10 +12,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
@@ -50,8 +52,45 @@ public class MusicLoggerApplication {
 //            for (var track : trackRepository.findAll()) {
 //                LOGGER.info(track.toString());
 //            }
+
+//            migrate(groupRepository, trackRepository);
         };
     }
+
+    // TODO: Migration
+//    private void migrate(GroupRepository groupRepository, FMTrackRepository trackRepository) {
+//        LOGGER.info("Connecting to original:");
+//
+//        System.out.println(System.getenv());
+//        var fmUrl = System.getenv("MIGRATE_URL") + "/music_logger";
+//
+//        LOGGER.info("Connecting to {}", fmUrl);
+//
+//        var dataSource = new DriverManagerDataSource();
+//        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//        dataSource.setUrl(fmUrl);
+//        dataSource.setUsername(System.getenv("MIGRATE_USER"));
+//        dataSource.setPassword(System.getenv("MIGRATE_PASS"));
+//
+//        var groups = new String[] {"Feature", "New Bin", "Library", "Recurrent", "Specialty Show"};
+//
+//        try (var conn = dataSource.getConnection()) {
+//            var results = conn.createStatement().executeQuery("SELECT * FROM tracks ORDER BY id DESC LIMIT 5;");
+//            LOGGER.info("Last 5 tracks:");
+//
+//            while (results.next()) {
+//                var artist = results.getString("artist");
+//                var title = results.getString("title");
+//                LOGGER.info("{} - {} [group: {}, played: {}]", artist, title, groups[results.getInt("group_id") + 1], results.getTimestamp("created_at"));
+//
+////                var track = new FMTrack()
+//            }
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        System.exit(1);
+//    }
 
     @Bean
     public Executor taskExecutor() {

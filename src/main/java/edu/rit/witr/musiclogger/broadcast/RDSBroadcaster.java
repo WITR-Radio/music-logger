@@ -103,8 +103,9 @@ public class RDSBroadcaster implements Broadcaster {
         message += "\r"; // TODO: \n might be necessary after this. The old python script appended \r\n but Mike's used only \r
         var buffer = message.getBytes(StandardCharsets.UTF_8);
         var packet = new DatagramPacket(buffer, buffer.length, address, port);
-        var datagramSocket = new DatagramSocket();
-        datagramSocket.send(packet);
+        try (var datagramSocket = new DatagramSocket()) {
+            datagramSocket.send(packet);
+        }
     }
 
     @Override

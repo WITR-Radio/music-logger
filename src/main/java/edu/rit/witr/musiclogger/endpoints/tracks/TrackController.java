@@ -102,12 +102,10 @@ public class TrackController {
             return EndpointUtility.badRequest("created_at must be a positive integer");
         }
 
-        var groupOptional = findGroup(adding.getGroup());
-        if (groupOptional.isEmpty()) {
-            return EndpointUtility.badRequest("Invalid group");
-        }
+        var group = findGroup(adding.getGroup())
+                .orElseGet(() -> findGroup("Music").get());
 
-        var track = adding.toTrack(groupOptional.get(), underground);
+        var track = adding.toTrack(group, underground);
         streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
         saveTrack(track, underground);
 
@@ -158,12 +156,10 @@ public class TrackController {
             return CompletableFuture.completedFuture(EndpointUtility.badRequest("title, artist and group parameters must all be non-null"));
         }
 
-        var groupOptional = findGroup(broadcasting.getGroup());
-        if (groupOptional.isEmpty()) {
-            return CompletableFuture.completedFuture(EndpointUtility.badRequest("Invalid group"));
-        }
+        var group = findGroup(broadcasting.getGroup())
+                .orElseGet(() -> findGroup("Music").get());
 
-        var track = broadcasting.toTrack(groupOptional.get(), underground);
+        var track = broadcasting.toTrack(group, underground);
         saveTrack(track, underground);
 
         // TODO: Properly handle async?
