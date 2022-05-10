@@ -19,8 +19,15 @@ public class BroadcastTrack implements Validatable {
         this.group = group;
     }
 
-    public BroadcastTrack fromTrack(Track track) { // todo: broadcast from
-        return new BroadcastTrack(track.getTitle(), track.getArtist(), track.getGroup().getName());
+    /**
+     * Creates a {@link BroadcastTrack} from a given {@link Track}, with a default group as "Music".
+     *
+     * @param track The {@link Track} to get the title, artist, and group names
+     * @return The created {@link BroadcastTrack}
+     */
+    public static BroadcastTrack fromTrack(Track track) { // todo: broadcast from
+        var group = track.getGroup() == null ? "Music" : track.getGroup().getName();
+        return new BroadcastTrack(track.getTitle(), track.getArtist(), group);
     }
 
     @Override

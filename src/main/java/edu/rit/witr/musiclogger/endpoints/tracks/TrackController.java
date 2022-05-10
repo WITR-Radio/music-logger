@@ -109,6 +109,7 @@ public class TrackController {
         streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
         saveTrack(track, underground);
 
+        broadcastService.broadcastTrack(BroadcastTrack.fromTrack(track), underground).join();
         return new ResponseEntity<>(track, HttpStatus.OK);
     }
 
