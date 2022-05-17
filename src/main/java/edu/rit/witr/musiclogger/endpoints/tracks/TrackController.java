@@ -8,7 +8,6 @@ import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
 import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
 import edu.rit.witr.musiclogger.database.repositories.TrackUpdater;
 import edu.rit.witr.musiclogger.endpoints.EndpointUtility;
-import edu.rit.witr.musiclogger.endpoints.SocketHandler;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
 import edu.rit.witr.musiclogger.streaming.StreamingManager;
@@ -53,8 +52,8 @@ public class TrackController {
     private final TrackUpdater trackUpdater;
     private final ObjectMapper mapper;
     private final BroadcastService broadcastService;
-    private final SocketHandler socketHandler;
     private final StreamingManager streamingManager;
+    private final TrackHandler trackHandler;
 
     public TrackController(@Autowired SearchingService searchingService,
                            @Autowired TrackRepository trackRepository,
@@ -62,16 +61,16 @@ public class TrackController {
                            @Autowired TrackUpdater trackUpdater,
                            ObjectMapper mapper,
                            @Autowired BroadcastService broadcastService,
-                           @Autowired SocketHandler socketHandler,
-                           @Autowired StreamingManager streamingManager) {
+                           @Autowired StreamingManager streamingManager,
+                           @Autowired TrackHandler trackHandler) {
         this.searchingService = searchingService;
         this.trackRepository = trackRepository;
         this.groupRepository = groupRepository;
         this.trackUpdater = trackUpdater;
         this.mapper = mapper;
         this.broadcastService = broadcastService;
-        this.socketHandler = socketHandler;
         this.streamingManager = streamingManager;
+        this.trackHandler = trackHandler;
     }
 
     @GetMapping("/api/tracks/list")
@@ -103,11 +102,11 @@ public class TrackController {
         }
 
         var group = findGroup(adding.getGroup())
-                .orElseGet(() -> findGroup("Music").get());
+                .orElseGet(trackHandler::getMusicGroup);
 
         var track = adding.toTrack(group, underground);
         streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
-        saveTrack(track, underground);
+        trackHandler.saveTrack(track, underground);
 
         broadcastService.broadcastTrack(BroadcastTrack.fromTrack(track), underground).join();
         return new ResponseEntity<>(track, HttpStatus.OK);
@@ -151,18 +150,22 @@ public class TrackController {
     @PostMapping("/api/tracks/broadcast")
     @Async
     public CompletableFuture<ResponseEntity<?>> broadcastTrack(@RequestBody BroadcastTrack broadcasting, @RequestParam(defaultValue = "false") boolean underground) {
-        LOGGER.debug("Broadcasting: {}", broadcasting);
+        if (!"true".equalsIgnoreCase(System.getenv("RIVENDELL_ENABLE"))) {
+            return CompletableFuture.completedFuture(EndpointUtility.ok(Map.of("message", "Rivendell disabled")));
+        }
+
+        LOGGER.debug("Broadcasting from Rivendell: {}", broadcasting);
 
         if (!broadcasting.validate()) {
             return CompletableFuture.completedFuture(EndpointUtility.badRequest("title, artist and group parameters must all be non-null"));
         }
 
         var group = findGroup(broadcasting.getGroup())
-                .orElseGet(() -> findGroup("Music").get());
+                .orElseGet(trackHandler::getMusicGroup);
 
         var track = broadcasting.toTrack(group, underground);
         streamingManager.applyLinks(List.of(track)).join(); // TODO: PROPER ASYNC!!
-        saveTrack(track, underground);
+        trackHandler.saveTrack(track, underground);
 
         // TODO: Properly handle async?
         return broadcastService.broadcastTrack(broadcasting, underground)
@@ -172,11 +175,6 @@ public class TrackController {
     @GetMapping("/api/track/current")
     public ResponseEntity<?> getCurrentTrack(@RequestParam(defaultValue = "false") boolean underground) {
         return new ResponseEntity<>(trackRepository.getLastTrack(underground), HttpStatus.OK);
-    }
-
-    private void saveTrack(Track track, boolean underground) {
-        trackRepository.save(track, underground);
-        socketHandler.broadcastTrack(track, underground);
     }
 
     /**

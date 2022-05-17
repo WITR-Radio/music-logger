@@ -31,6 +31,10 @@ public class AddedTrack implements Validatable {
      */
     @Override
     public boolean validate() {
+        if ("Event".equalsIgnoreCase(group)) {
+            return artist != null && time != null;
+        }
+
         return title != null && artist != null && group != null && time != null;
     }
 

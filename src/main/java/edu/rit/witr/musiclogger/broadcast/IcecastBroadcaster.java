@@ -54,7 +54,7 @@ public class IcecastBroadcaster implements Broadcaster {
 
             return Optional.of(new IcecastBroadcaster(client, jaxbContext));
         } catch (JAXBException e) {
-            LOGGER.error("A fatal error occurred while creating the JAXBContext", e);
+            LOGGER.error("A fatal error occurred while creating the IceStats JAXBContext", e);
             return Optional.empty();
         }
     }

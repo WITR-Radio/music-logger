@@ -5,6 +5,7 @@ import edu.rit.witr.musiclogger.database.repositories.GroupRepository;
 import edu.rit.witr.musiclogger.entities.FMTrack;
 import edu.rit.witr.musiclogger.entities.Group;
 import edu.rit.witr.musiclogger.entities.Track;
+import edu.rit.witr.musiclogger.tcp.NowPlaying;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -16,6 +17,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -101,6 +104,16 @@ public class MusicLoggerApplication {
         executor.setThreadNamePrefix("MusicLogger-");
         executor.initialize();
         return executor;
+    }
+
+    @Bean(name = "nowPlayingContext")
+    public JAXBContext nowPlayingContext() {
+        try {
+            return JAXBContext.newInstance(NowPlaying.class);
+        } catch (JAXBException e) {
+            LOGGER.error("A fatal error occurred while creating the NowPlaying JAXBContext", e);
+            return null;
+        }
     }
 
     private void initGroups(GroupRepository repository) {
