@@ -80,7 +80,7 @@ public class IcecastBroadcaster implements Broadcaster {
                             var mount = source.getMount();
                             var undergroundMount = mount.contains("witr-undrgnd") || mount.contains("witr-undergrounds");
                             if (underground == undergroundMount) {
-                                tasks.add(updateIcecast(mount, track.getTitle(), underground));
+                                tasks.add(updateIcecast(mount, track.getTitle(), track.getArtist(), underground));
                             }
                         }
 
@@ -97,17 +97,19 @@ public class IcecastBroadcaster implements Broadcaster {
     /**
      * Sends an update to Icecast with a specific mount, found by listing {@link #LISTMOUNTS_URL}.
      *
-     * @param mount The mount point (e.g. "witr-hockey-mp3", "witr-mobile", etc.)
-     * @param song The song name to send
+     * @param mount       The mount point (e.g. "witr-hockey-mp3", "witr-mobile", etc.)
+     * @param song        The song name to send
+     * @param artist      The artist name to send
      * @param underground If this request is being performed on underground (used only for logging purposes)
      * @return The {@link CompletableFuture} of the request
      */
-    private CompletableFuture<Void> updateIcecast(String mount, String song, boolean underground) {
+    private CompletableFuture<Void> updateIcecast(String mount, String song, String artist, boolean underground) {
         try {
+            var songLine = artist + " - " + song;
             var uri = new URIBuilder(META_URL)
                     .addParameter("mount", mount)
                     .addParameter("mode", "updinfo")
-                    .addParameter("song", song)
+                    .addParameter("song", songLine)
                     .build();
 
             var request = HttpRequest.newBuilder()
@@ -119,9 +121,9 @@ public class IcecastBroadcaster implements Broadcaster {
             return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .thenAccept(res -> {
                         if (res.statusCode() != 200) {
-                            LOGGER.error("Erroneous status code ({}) on icecast update (mount = {}, song = {}): {}", res.statusCode(), mount, song, res.body());
+                            LOGGER.error("Erroneous status code ({}) on icecast update (mount = {}, song = {}): {}", res.statusCode(), mount, songLine, res.body());
                         } else {
-                            LOGGER.debug("Updated {}icecast: {}", underground ? "underground " : "", song);
+                            LOGGER.debug("Updated {}icecast: {}", underground ? "underground " : "", songLine);
                         }
                     });
         } catch (URISyntaxException e) {
