@@ -67,22 +67,13 @@ public class DefaultSearchingService implements SearchingService {
                     if (song != null) {
                         // Exact matching should be higher
                         b.must(f.match().field("title").matching(song));
-
-                        // TODO: Inspect fuzzy searching
-                        b.should(f.match().field("title").matching(song).fuzzy(2));
                     }
 
                     if (artist != null) {
                         b.must(f.match().field("artist").matching(artist));
                     }
                 }))
-                .sort(sort -> {
-                    if (song != null || artist != null) {
-                        return sort.score();
-                    }
-
-                    return sort.field("id").desc();
-                })
+                .sort(sort -> sort.field("time").desc())
                 .fetchHits(offset, count);
     }
 
