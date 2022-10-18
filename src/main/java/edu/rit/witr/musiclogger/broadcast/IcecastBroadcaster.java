@@ -78,7 +78,7 @@ public class IcecastBroadcaster implements Broadcaster {
                         var tasks = new ArrayList<CompletableFuture<?>>();
                         for (var source : iceStats.getSources()) {
                             var mount = source.getMount();
-                            var undergroundMount = mount.startsWith("udg");
+                            var undergroundMount = mount.contains("udg");
                             if (underground == undergroundMount) {
                                 tasks.add(updateIcecast(mount, track.getTitle(), track.getArtist(), underground));
                             }
