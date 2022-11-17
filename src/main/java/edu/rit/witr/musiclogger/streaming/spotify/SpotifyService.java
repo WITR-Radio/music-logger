@@ -110,6 +110,12 @@ public class SpotifyService implements StreamingService {
         return spotifyURI.substring(colon);
     }
 
+    /**
+     * Gets the first album art image that is <=300px large if present. Otherwise, any artwork image is returned.
+     *
+     * @param album The album to get the art of
+     * @return The album art link, or an empty string
+     */
     private String getAlbumArtLink(AlbumSimplified album) {
         var images = album.getImages();
         for (var image : images) {
