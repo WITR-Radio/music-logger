@@ -2,6 +2,7 @@ package edu.rit.witr.musiclogger.endpoints;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.rit.witr.musiclogger.database.repositories.TrackRepository;
+import edu.rit.witr.musiclogger.endpoints.tracks.TrackBroadcastDTO;
 import edu.rit.witr.musiclogger.entities.Track;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -46,21 +48,29 @@ public class SocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
         var underground = isUnderground(session);
         getSessions(underground).add(session);
+    }
 
-        if (sendInitial(session)) {
-            trackRepository.getLastTrack(underground).ifPresentOrElse(track -> {
-                try {
-                    var json = objectMapper.writeValueAsString(track);
-                    broadcastTrack(json, session);
-                } catch (IOException e) {
-                    LOGGER.error("An error occurred while sending initial track", e);
-                }
-            }, () -> LOGGER.info("Nothing found lol"));
+    @Override
+    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) throws Exception {
+        var json = objectMapper.readValue(message.getPayload(), HashMap.class);
+        var underground = isUnderground(session);
+
+        if (json.containsKey("request")) {
+            if ("current".equals(json.get("request"))) {
+                trackRepository.getLastTrack(underground).ifPresent(track -> {
+                    try {
+                        var trackJson = objectMapper.writeValueAsString(new TrackBroadcastDTO(track, true));
+                        broadcastTrack(trackJson, session);
+                    } catch (IOException e) {
+                        LOGGER.error("An error occurred while sending requested track", e);
+                    }
+                });
+            }
         }
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, @NonNull CloseStatus status) throws Exception {
+    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) throws Exception {
         getSessions(isUnderground(session)).remove(session);
     }
 
@@ -74,7 +84,7 @@ public class SocketHandler extends TextWebSocketHandler {
     public void broadcastTrack(Track track, boolean underground) {
         CompletableFuture.runAsync(() -> {
             try {
-                var json = objectMapper.writeValueAsString(track);
+                var json = objectMapper.writeValueAsString(new TrackBroadcastDTO(track, false));
                 getSessions(underground).forEach(session -> {
                     try {
                         broadcastTrack(json, session);
@@ -94,6 +104,13 @@ public class SocketHandler extends TextWebSocketHandler {
         }, broadcastExecutor);
     }
 
+    /**
+     * Broadcasts a given track JSON string to the given session.
+     *
+     * @param json      The JSON of the track being broadcasted
+     * @param session   The session to send this to
+     * @throws IOException If an exception occurs
+     */
     private void broadcastTrack(String json, WebSocketSession session) throws IOException {
         session.sendMessage(new TextMessage(json));
     }
@@ -109,11 +126,12 @@ public class SocketHandler extends TextWebSocketHandler {
         return decoded.getOrDefault("underground", List.of("")).contains("true");
     }
 
-    private boolean sendInitial(WebSocketSession session) {
-        var decoded = decodeQuery(session.getUri());
-        return decoded.getOrDefault("sendInitial", List.of("")).contains("true");
-    }
-
+    /**
+     * Decodes a URI's query string into a key, value map.
+     *
+     * @param uri The URI to decode
+     * @return The query parameters
+     */
     private MultiValueMap<String, String> decodeQuery(URI uri) {
         return UriComponentsBuilder.fromUri(uri).build().getQueryParams();
     }
