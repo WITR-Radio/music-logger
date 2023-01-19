@@ -35,8 +35,8 @@ TUNEIN_PARTNER_KEY - The TuneIn partner API key
 TUNEIN_STATION_ID - The TuneIn station ID
 WIDEORBIT_HOST - The hostname of the WideOrbit server
 WIDEORBIT_PORT - The port WideOrbit is broadcasting events to
-WIDEORBIT_ENABLE - If wideorbit should be receiving data (boolean, defaults to false)
-RIVENDELL_ENABLE - If rivendell should be receiving data (boolean, defaults to false)
+WIDEORBIT_ENABLE - If data should be received from wideorbit (boolean, defaults to false)
+RIVENDELL_ENABLE - If data should be received from rivendell (boolean, defaults to false)
 ```
 
 For local development, it is **highly** recommended to leave `BROADCAST_ENABLE` as `false`. All broadcasting to WITR services will be disabled, which ensures no disruption to anything in production. If `false`, the variables below it in the template may be omitted or left blank.
