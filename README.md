@@ -66,7 +66,22 @@ The IP/hostname and port for WideOrbit.
 
 ## Running
 
-Before running, ensure environment variables have been populated and [dev-environments](https://github.com/WITR-Radio/dev-environments/tree/master/primary) for `primary` have been set up and running.
+The next step will depend on if you are running this yourself independently, or internally at WITR. We have containerized development environments to keep application state version controlled across all projects, which is not open source quite yet (stay tuned!).
+
+<details>
+<summary><b>Independently</b></summary></br>
+
+Set up and start a Postgres (or similar) database, setting its credentials/URL to the relevant environment variables.
+</details>
+
+<details>
+<summary><b>Internally</b></summary></br>
+
+Ensure you have set up the [dev-environments](https://github.com/WITR-Radio/dev-environments/tree/master/primary) for `primary`, and start the environment.
+</details>
+
+
+When the relevant step has been completed, populate the environment variables and continue.
 
 In order to run the backend, your IDE must be able to read the `.env` file. IntelliJ does not have such a feature out of the box, so a plugin like [EnvFile](https://plugins.jetbrains.com/plugin/7861-envfile) may be used. If using the plugin, make sure it is enabled for the run configuration. Run the program from the file `edu.rit.witr.musiclogger.MusicLoggerApplication`.
 
